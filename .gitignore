@@ -3,4 +3,6 @@ __pycache__/
 .env
 *.csv
 *.tif
+*.json
+data/
 outputs/
