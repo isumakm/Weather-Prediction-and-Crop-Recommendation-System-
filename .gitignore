@@ -1,0 +1,12 @@
+__pycache__/
+.ipynb_checkpoints/
+
+.env
+
+*.csv
+*.tif
+*.json
+*.png
+
+data/
+outputs/
