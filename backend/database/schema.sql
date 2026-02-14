@@ -1,3 +1,6 @@
+CREATE DATABASE soil_xai;
+USE soil_xai;
+
 CREATE TABLE soil_points (
     id INT AUTO_INCREMENT PRIMARY KEY,
     lat DOUBLE,
