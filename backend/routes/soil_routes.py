@@ -1,7 +1,8 @@
 from flask import Blueprint, request, jsonify
 from backend.services.soil_service import (
     get_soil_by_location,
-    get_cluster_explanation
+    get_cluster_explanation,
+    get_cluster_means
 )
 
 soil_bp = Blueprint("soil", __name__)
@@ -20,8 +21,10 @@ def soil_info():
         return jsonify({"error": "No soil data found"}), 404
 
     explanation = get_cluster_explanation(soil["cluster"])
+    cluster_means = get_cluster_means(soil["cluster"])
 
     return jsonify({
         "soil_properties": soil,
-        "cluster_explanation": explanation
+        "cluster_explanation": explanation,
+        "cluster_means": cluster_means
     })
