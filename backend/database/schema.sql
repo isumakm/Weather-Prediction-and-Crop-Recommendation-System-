@@ -19,5 +19,7 @@ CREATE TABLE soil_points (
 CREATE TABLE cluster_explanations (
     cluster INT PRIMARY KEY,
     zone_name VARCHAR(100),
-    zone_description TEXT
+    water_behavior TEXT,
+    nutrient_strength TEXT,
+    acidity TEXT
 );
