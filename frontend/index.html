@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Prediction and Crop Recommendation System - Western Province, Sri Lanka</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================
+           GENERAL THEME & RESET
+           =========================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Raleway';
+            background: linear-gradient(135deg, #f5ede4 0%, #faf8f3 50%, #f0f4e8 100%);
+            color: #5a5447;
+        }
+
+        /* ===========================
+           APP CONTAINER
+           =========================== */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: linear-gradient(135deg, #f5ede4 0%, #faf8f3 50%, #f0f4e8 100%);
+        }
+
+        /* ===========================
+           HEADER
+           =========================== */
+        .header {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content h1 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-content p {
+            font-size: 14px;
+            color: #e8f0e8;
+            font-weight: 500;
+        }
+
+        /* ===========================
+           MAIN CONTENT
+           =========================== */
+        .main-content {
+            display: flex;
+            flex: 1;
+            gap: 24px;
+            padding: 24px;
+            overflow: hidden;
+        }
+
+        /* ===========================
+           MAP CONTAINER
+           =========================== */
+        .map-container {
+            flex: 1;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 3px solid #d4dfc9;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #map {
+            width: 100%;
+            flex: 1;
+        }
+
+        .map-button {
+            margin: 12px;
+            padding: 10px 20px;
+            background: #d2b452;
+            color: #1a3205;
+            font-family: 'Raleway';
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .map-button:hover {
+            background: #a57f18;
+            transform: translateY(-2px);
+        }
+
+        /* ===========================
+           INFO PANEL
+           =========================== */
+        .info-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 8px;
+        }
+
+        .info-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+
+        .info-panel::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        /* ===========================
+           CARDS
+           =========================== */
+        .card {
+            background: #fefdfb;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            border: 2px solid #e8e4d9;
+            flex-shrink: 0;
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0ede7;
+            padding-bottom: 16px;
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #5a5447;
+        }
+
+        /* ===========================
+           SOIL PROPERTIES
+           =========================== */
+        .soil-properties {
+            border: 2px solid #d4dfc9;
+        }
+
+        .properties-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .property-box {
+            padding: 20px;
+            border-radius: 16px;
+            border: 2px solid;
+            transition: all 0.3s ease;
+        }
+
+        .property-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .property-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+
+        .property-value {
+            font-family: 'Segoe UI';
+            font-size: 28px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        /* Property Color Variants */
+        .property-taw {
+            background: linear-gradient(135deg, #e8f0e3 0%, #dfe7d9 100%);
+            border: none;
+            color: #6b8b63;
+        }
+
+        .property-carbon {
+            background: linear-gradient(135deg, #e8ebe8 0%, #dfe3d9 100%);
+            border: none;
+            color: #6b7b6e;
+        }
+
+        .property-cec {
+            background: linear-gradient(135deg, #f5ede4 0%, #f0e6d9 100%);
+            border: none;
+            color: #8b7559;
+        }
+
+        .property-ph {
+            background: linear-gradient(135deg, #f0e8e8 0%, #e8dfd9 100%);
+            border: none;
+            color: #7b6b6b;
+        }
+
+        .property-bd {
+            background: linear-gradient(135deg, #f0e6d9 0%, #e8dfd9 100%);
+            border: none;
+            color: #8b6b5b;
+        }
+
+        .property-sand {
+            background: linear-gradient(135deg, #f5d9d4 0%, #f0cdc9 100%);
+            border: none;
+            color: #8b5e53;
+        }
+
+        .property-placeholder {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+            font-size: 16px;
+        }
+
+        .unit {
+            font-size: 0.6em;
+            font-weight: 600;
+            opacity: 0.75;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+
+        /* ===========================
+           CLUSTER INFO
+           =========================== */
+        .cluster-info {
+            border: 2px solid #d4d9cf;
+            background: linear-gradient(135deg, #f0ede8 0%, #ebe8e3 100%);
+        }
+
+        .cluster-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8b7b6b;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .cluster-info h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #5a5447;
+            margin-bottom: 16px;
+        }
+
+        .cluster-explanation-list {
+            list-style: none;
+            space-y: 12px;
+        }
+
+        .cluster-explanation-list li {
+            font-size: 14px;
+            text-align: left;
+            color: #6b6359;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .cluster-explanation-list span {
+            font-weight: 600;
+            color: #5a5447;
+        }
+
+        /* ===========================
+           CHART CONTAINER
+           =========================== */
+        .chart-container {
+            border: 2px solid #d4dfc9;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-container h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #5a5447;
+            margin-bottom: 16px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            flex: 1;
+            min-height: 280px;
+        }
+
+        #soilChart {
+            max-height: 280px;
+        }
+
+        /* ===========================
+           ALERTS
+           =========================== */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .alert-info {
+            background: #e8ebe8;
+            border-color: #b8d4a8;
+            color: #6b8b63;
+        }
+
+
+        #loadingAlert {
+            display: none !important;
+        }
+
+
+        .alert-error {
+            background: #f5d9d4;
+            border-color: #d9b5a8;
+            color: #8b5e53;
+        }
+
+        /* ===========================
+           BUTTONS
+           =========================== */
+        .btn {
+            padding: 16px 24px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Raleway';
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .btn-predict {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            font-family: 'Raleway';
+            font-size: 18px;
+            padding: 20px 24px;
+            box-shadow: 0 10px 25px rgba(62, 110, 6, 0.25);
+            border: 2px solid transparent;
+            width: 100%;
+        }
+
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(62, 110, 6, 0.35);
+        }
+
+        .btn-predict:active {
+            transform: translateY(0);
+        }
+
+        .btn-predict:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===========================
+           RESPONSIVE DESIGN
+           =========================== */
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                gap: 16px;
+                padding: 16px;
+            }
+
+            .map-container {
+                height: 400px;
+            }
+
+            .properties-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .property-sand {
+                grid-column: 1;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .header-content h1 {
+                font-size: 24px;
+            }
+
+            .header-content p {
+                font-size: 12px;
+            }
+
+            .main-content {
+                padding: 12px;
+                gap: 12px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 12px;
+            }
+
+            .card-header h2 {
+                font-size: 18px;
+            }
+
+            .property-box {
+                padding: 16px;
+            }
+
+            .property-value {
+                font-size: 24px;
+            }
+
+            .btn-predict {
+                padding: 16px 20px;
+                font-size: 16px;
+            }
+
+            .info-panel {
+                gap: 12px;
+            }
+        }
+
+        /* ===========================
+           ANIMATIONS
+           =========================== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .property-box {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .card {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* ===========================
+           UTILITY CLASSES
+           =========================== */
+        .hidden {
+            display: none !important;
+        }
+
+        .visible {
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Weather Prediction and Crop Recommendation System</h1>
+            <p>Western Province, Sri Lanka</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Left: Map -->
+        <div class="map-container">
+            <div id="map"></div>
+            <button class="map-button" id="clusterToggleBtn" style="display: none;">Show Western Province Soil Management Zone Map</button>
+        </div>
+
+        <!-- Right: Info Panel -->
+        <div class="info-panel">
+            <!-- Soil Properties -->
+            <div class="card soil-properties">
+                <div class="card-header">
+                    <h2>Soil Properties</h2>
+                </div>
+                <div class="properties-grid" id="propertiesGrid">
+                    <div class="property-placeholder">Click on the map to see soil properties</div>
+                </div>
+            </div>
+
+            <!-- Cluster Explanation -->
+            <div class="card cluster-info" id="clusterCard" style="display: none;">
+                <div class="cluster-label" id="clusterLabel"></div>
+                <h3 id="zoneName"></h3>
+                <ul class="cluster-explanation-list" id="clusterList"></ul>
+            </div>
+
+            <!-- Chart -->
+            <div class="card chart-container" id="chartCard" style="display: none;">
+                <h3>Soil Property Comparison</h3>
+                <div class="chart-wrapper">
+                    <canvas id="soilChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="alert alert-info" id="loadingAlert" style="display: none;"></div>
+
+            <!-- Error State -->
+            <div class="alert alert-error" id="errorAlert" style="display: none;">
+                <span id="errorMessage"></span>
+            </div>
+
+            <!-- Predict Weather Button -->
+            <button class="btn btn-predict" id="predictBtn" style="display: none;">
+                Predict Weather
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const API_BASE = "http://127.0.0.1:5000";
+
+// State
+let map = null;
+let chart = null;
+let clusterLayer = null;
+let clickedLocationMarker = null;
+let showingClusterMap = false;
+let currentSoilData = null;
+let currentClusterMeans = null;
+let currentClusterExplanation = null;
+
+// Constants
+const PROPERTY_UNITS = {
+    taw: "mm",
+    organic_carbon: "%",
+    cec: "cmol(+)/kg",
+    ph: "pH",
+    bulk_density: "g/cm³",
+    sand_pct: "%",
+};
+
+const PROPERTY_LABELS = {
+    taw: "Total Available Water (TAW)",
+    organic_carbon: "Organic Carbon",
+    cec: "Cation Exchange Capacity (CEC)",
+    ph: "pH",
+    bulk_density: "Bulk Density",
+    sand_pct: "Sand Percentage",
+};
+
+// Initialize app
+document.addEventListener('DOMContentLoaded', function() {
+    initializeMap();
+    setupEventListeners();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    document.getElementById('clusterToggleBtn').addEventListener('click', toggleClusterVisualization);
+    document.getElementById('predictBtn').addEventListener('click', handlePredictWeather);
+}
+
+// Initialize map
+function initializeMap() {
+    if (document.querySelector('#map')._leaflet_id) {
+        return; // Map already initialized
+    }
+
+    map = L.map('map', {
+        maxBounds: [
+            [6.4, 79.7],
+            [7.3, 80.3]
+        ],
+        maxBoundsViscosity: 1.0
+    }).setView([6.9, 79.9], 9);
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "© OpenStreetMap contributors"
+    }).addTo(map);
+
+    // Map click handler
+    map.on("click", async function(e) {
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+
+        // Check if click is within bounds
+        if (lat < 6.4 || lat > 7.3 || lon < 79.7 || lon > 80.3) {
+            showError("No soil data found for this location");
+            clearData();
+            return;
+        }
+
+        showLoading(true);
+        hideError();
+
+        try {
+            const response = await fetch(`${API_BASE}/soil?lat=${lat}&lon=${lon}`);
+            
+            if (!response.ok) {
+                showError("No soil data found for this location");
+                clearData();
+                return;
+            }
+
+            const data = await response.json();
+            currentSoilData = data.soil_properties;
+            currentClusterMeans = data.cluster_means;
+            currentClusterExplanation = data.cluster_explanation;
+            
+            displaySoilProperties(data.soil_properties);
+            displayClusterInfo(data.cluster_explanation, data.soil_properties.cluster);
+            drawChart(data.soil_properties, data.cluster_means);
+            
+            // Show cluster toggle and predict button
+            document.getElementById('clusterToggleBtn').style.display = 'block';
+            document.getElementById('predictBtn').style.display = 'flex';
+            
+            // Add marker for clicked location
+            if (clickedLocationMarker) {
+                map.removeLayer(clickedLocationMarker);
+            }
+            clickedLocationMarker = L.circleMarker([lat, lon], {
+                radius: 6,
+                fillColor: "#3e6e06",
+                color: "#1a3205",
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8,
+            });
+            clickedLocationMarker.addTo(map);
+
+            showLoading(false);
+
+        } catch (err) {
+            showError("Error connecting to backend. Make sure the server is running.");
+            clearData();
+            showLoading(false);
+        }
+    });
+}
+
+// Display soil properties in separate boxes
+function displaySoilProperties(soil) {
+    const grid = document.getElementById('propertiesGrid');
+
+    grid.innerHTML = `
+        <div class="property-box property-taw">
+            <div class="property-label">${PROPERTY_LABELS.taw}</div>
+            <div class="property-value">
+                ${soil.taw.toFixed(2)}
+                <span class="unit">${PROPERTY_UNITS.taw}</span>
+            </div>
+        </div>
+
+        <div class="property-box property-carbon">
+            <div class="property-label">${PROPERTY_LABELS.organic_carbon}</div>
+            <div class="property-value">
+                ${soil.organic_carbon.toFixed(2)}
+                <span class="unit">${PROPERTY_UNITS.organic_carbon}</span>
+            </div>
+        </div>
+
+        <div class="property-box property-cec">
+            <div class="property-label">${PROPERTY_LABELS.cec}</div>
+            <div class="property-value">
+                ${soil.cec.toFixed(2)}
+                <span class="unit">${PROPERTY_UNITS.cec}</span>
+            </div>
+        </div>
+
+        <div class="property-box property-ph">
+            <div class="property-label">${PROPERTY_LABELS.ph}</div>
+            <div class="property-value">
+                ${soil.ph.toFixed(2)}
+                <span class="unit">${PROPERTY_UNITS.ph}</span>
+            </div>
+        </div>
+
+        <div class="property-box property-bd">
+            <div class="property-label">${PROPERTY_LABELS.bulk_density}</div>
+            <div class="property-value">
+                ${soil.bulk_density.toFixed(2)}
+                <span class="unit">${PROPERTY_UNITS.bulk_density}</span>
+            </div>
+        </div>
+
+        <div class="property-box property-sand">
+            <div class="property-label">${PROPERTY_LABELS.sand_pct}</div>
+            <div class="property-value">
+                ${soil.sand_pct.toFixed(2)}
+                <span class="unit">${PROPERTY_UNITS.sand_pct}</span>
+            </div>
+        </div>
+    `;
+}
+
+// Display cluster explanation with bullet points
+function displayClusterInfo(explanation, cluster) {
+    document.getElementById('clusterLabel').innerHTML = `Zone ${cluster}`;
+    document.getElementById('zoneName').innerHTML = explanation.zone_name;
+    
+    const listHTML = `
+        <li><span>Water Behavior:</span> ${explanation.water_behavior}</li>
+        <li><span>Nutrient Strength:</span> ${explanation.nutrient_strength}</li>
+        <li><span>Acidity:</span> ${explanation.acidity}</li>
+    `;
+    document.getElementById('clusterList').innerHTML = listHTML;
+
+    document.getElementById('clusterCard').style.display = 'block';
+}
+
+// Draw comparison chart
+function drawChart(soil, clusterMeans) {
+    const canvasElement = document.getElementById("soilChart");
+    if (!canvasElement) return;
+
+    if (chart) {
+        chart.destroy();
+    }
+
+    const ctx = canvasElement.getContext("2d");
+
+    const labels = ["TAW", "Organic Carbon", "CEC", "pH", "Bulk Density", "Sand %"];
+    const pointValues = [soil.taw, soil.organic_carbon, soil.cec, soil.ph, soil.bulk_density, soil.sand_pct];
+    const clusterValues = [clusterMeans.taw, clusterMeans.organic_carbon, clusterMeans.cec, clusterMeans.ph, clusterMeans.bulk_density, clusterMeans.sand_pct];
+
+    chart = new Chart(ctx, {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Selected Location",
+                    data: pointValues,
+                    backgroundColor: "#3e6e06",
+                    borderRadius: 6,
+                    borderSkipped: false,
+                },
+                {
+                    label: "Zone Average",
+                    data: clusterValues,
+                    backgroundColor: "#d2b452",
+                    borderRadius: 6,
+                    borderSkipped: false,
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: "bottom",
+                    labels: {
+                        usePointStyle: true,
+                        padding: 15,
+                        font: {
+                            size: 12,
+                            weight: "500"
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: "rgba(0, 0, 0, 0.05)"
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+
+    document.getElementById('chartCard').style.display = 'block';
+}
+
+// Toggle cluster visualization
+async function toggleClusterVisualization() {
+    if (showingClusterMap) {
+        // Hide cluster visualization
+        if (clusterLayer) {
+            map.removeLayer(clusterLayer);
+            clusterLayer = null;
+        }
+        showingClusterMap = false;
+        document.getElementById('clusterToggleBtn').textContent = 'Show Cluster Map';
+    } else {
+        // Show cluster visualization
+        try {
+            showLoading(true);
+
+            const response = await fetch(`${API_BASE}/clusters`);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch cluster data');
+            }
+
+            const clusterData = await response.json();
+            clusterLayer = L.layerGroup();
+
+            const clusterColors = [
+                "#3e6e06", 
+                "#d2b452",
+                "#a57f18",
+                "#806e34",
+                "#665521",
+                "#1a3205",
+            ];
+
+            // Plot clusters from database
+            clusterData.clusters.forEach((zone, idx) => {
+                const circle = L.circle([zone.latitude, zone.longitude], {
+                    radius: zone.radius || 5000,
+                    fillColor: clusterColors[idx % clusterColors.length],
+                    color: clusterColors[idx % clusterColors.length],
+                    weight: 2,
+                    opacity: 0.4,
+                    fillOpacity: 0.2,
+                });
+
+                const popup = L.popup().setContent(
+                    `<div style="font-family: Raleway; font-weight: bold;">Management Zone ${zone.cluster_id}</div>`
+                );
+                circle.bindPopup(popup);
+                circle.addTo(clusterLayer);
+            });
+
+            clusterLayer.addTo(map);
+            showingClusterMap = true;
+            document.getElementById('clusterToggleBtn').textContent = 'Show Satellite Map';
+            showLoading(false);
+        } catch (err) {
+            showError('Failed to load cluster data from database');
+            console.error('Cluster loading error:', err);
+            showLoading(false);
+        }
+    }
+}
+
+// Show loading alert
+function showLoading(show) {
+    const loadingAlert = document.getElementById('loadingAlert');
+    if (show) {
+        loadingAlert.style.display = 'flex';
+    } else {
+        loadingAlert.style.display = 'none';
+    }
+}
+
+// Show error alert
+function showError(message) {
+    const errorAlert = document.getElementById('errorAlert');
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.innerHTML = `⚠️ ${message}`;
+    errorAlert.style.display = 'flex';
+}
+
+// Hide error alert
+function hideError() {
+    document.getElementById('errorAlert').style.display = 'none';
+}
+
+// Clear all data
+function clearData() {
+    currentSoilData = null;
+    currentClusterMeans = null;
+    currentClusterExplanation = null;
+    
+    document.getElementById('propertiesGrid').innerHTML = '<div class="property-placeholder">Click on the map to see soil properties</div>';
+    document.getElementById('clusterCard').style.display = 'none';
+    document.getElementById('chartCard').style.display = 'none';
+    document.getElementById('clusterToggleBtn').style.display = 'none';
+    document.getElementById('predictBtn').style.display = 'none';
+    
+    if (chart) {
+        chart.destroy();
+        chart = null;
+    }
+    
+    if (clickedLocationMarker) {
+        map.removeLayer(clickedLocationMarker);
+        clickedLocationMarker = null;
+    }
+    
+    if (clusterLayer) {
+        map.removeLayer(clusterLayer);
+        clusterLayer = null;
+        showingClusterMap = false;
+    }
+}
+
+// Handle predict weather button
+function handlePredictWeather() {
+    alert('Weather prediction feature coming soon!');
+    // Thirusha
+}
+</script>
+
+</body>
+</html>
