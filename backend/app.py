@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from backend.routes.soil_routes import soil_bp
+from backend.soil_routes import soil_bp
 
 app = Flask(__name__)
 CORS(app)

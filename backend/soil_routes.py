@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.soil_service import (
+from backend.soil_service import (
     get_soil_by_location,
     get_cluster_explanation,
     get_cluster_means
