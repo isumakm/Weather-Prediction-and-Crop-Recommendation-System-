@@ -20,16 +20,12 @@
         /* ===========================
            GENERAL THEME & RESET
            =========================== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         html, body {
             height: 100%;
             overflow: hidden;
-            font-family: 'Raleway';
+            font-family: 'Raleway', sans-serif;
             background: linear-gradient(135deg, #f5ede4 0%, #faf8f3 50%, #f0f4e8 100%);
             color: #5a5447;
         }
@@ -51,21 +47,32 @@
             background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
             color: white;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header-content h1 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
+        .header-content h1 { font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+        .header-content p  { font-size: 14px; color: #e8f0e8; font-weight: 500; }
 
-        .header-content p {
-            font-size: 14px;
-            color: #e8f0e8;
-            font-weight: 500;
+        .header-controls { display: flex; gap: 16px; align-items: center; }
+
+        .auth-button {
+            padding: 10px 20px;
+            background: #d2b452;
+            color: #1a3205;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Raleway';
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
+        .auth-button:hover { background: #a57f18; }
+
+        .user-info { color: #e8f0e8; font-weight: 600; }
 
         /* ===========================
            MAIN CONTENT
@@ -85,17 +92,15 @@
             flex: 1;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             border: 3px solid #d4dfc9;
             background: white;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
-        #map {
-            width: 100%;
-            flex: 1;
-        }
+        #map { width: 100%; flex: 1; }
 
         .map-button {
             margin: 12px;
@@ -109,12 +114,34 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-size: 14px;
+            display: block;
         }
+        .map-button:hover { background: #a57f18; transform: translateY(-2px); }
 
-        .map-button:hover {
-            background: #a57f18;
-            transform: translateY(-2px);
+        /* Map legend overlay */
+        .map-legend {
+            position: absolute;
+            bottom: 58px;
+            left: 10px;
+            background: rgba(254,253,251,0.96);
+            border: 2px solid #d4dfc9;
+            border-radius: 10px;
+            padding: 10px 14px;
+            z-index: 500;
+            font-family: 'Raleway', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5a5447;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+            display: none;
         }
+        .map-legend.visible { display: block; }
+        .map-legend-title {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.6px; color: #8b7b6b; margin-bottom: 8px;
+        }
+        .map-legend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+        .map-legend-swatch { width: 14px; height: 14px; border-radius: 3px; flex-shrink: 0; }
 
         /* ===========================
            INFO PANEL
@@ -129,23 +156,10 @@
             padding-right: 8px;
         }
 
-        .info-panel::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .info-panel::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.05);
-            border-radius: 10px;
-        }
-
-        .info-panel::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.15);
-            border-radius: 10px;
-        }
-
-        .info-panel::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 0, 0, 0.25);
-        }
+        .info-panel::-webkit-scrollbar { width: 8px; }
+        .info-panel::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); border-radius: 10px; }
+        .info-panel::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 10px; }
+        .info-panel::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.25); }
 
         /* ===========================
            CARDS
@@ -154,119 +168,66 @@
             background: #fefdfb;
             border-radius: 20px;
             padding: 24px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
             border: 2px solid #e8e4d9;
             flex-shrink: 0;
         }
 
-        .card-header {
-            margin-bottom: 20px;
-            border-bottom: 2px solid #f0ede7;
-            padding-bottom: 16px;
-        }
+        .card-header { margin-bottom: 20px; border-bottom: 2px solid #f0ede7; padding-bottom: 16px; }
+        .card-header h2 { font-size: 20px; font-weight: 700; color: #5a5447; }
 
-        .card-header h2 {
-            font-size: 20px;
-            font-weight: 700;
+        /* ===========================
+           MODEL SELECTOR
+           =========================== */
+        .model-select {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: 2px solid #d4dfc9;
+            background: #fefdfb;
             color: #5a5447;
+            font-family: 'Raleway';
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-size: 14px;
         }
+        .model-select:hover { border-color: #3e6e06; background: white; }
+        .model-select option { background: white; color: #5a5447; }
 
         /* ===========================
            SOIL PROPERTIES
            =========================== */
-        .soil-properties {
-            border: 2px solid #d4dfc9;
-        }
-
         .properties-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
-        .property-box {
-            padding: 20px;
-            border-radius: 16px;
-            border: 2px solid;
-            transition: all 0.3s ease;
-        }
-
-        .property-box:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-        }
+        .property-box { padding: 16px; border-radius: 16px; transition: all 0.3s ease; }
+        .property-box:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(0,0,0,0.1); }
 
         .property-label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
-            opacity: 0.7;
+            font-size: 11px; font-weight: 600; text-transform: uppercase;
+            letter-spacing: 0.8px; margin-bottom: 6px; opacity: 0.7;
         }
+        .property-value { font-family: 'Segoe UI', sans-serif; font-size: 22px; font-weight: 600; line-height: 1; }
+        .unit { font-size: 0.6em; font-weight: 600; opacity: 0.75; margin-left: 4px; vertical-align: middle; }
 
-        .property-value {
-            font-family: 'Segoe UI';
-            font-size: 28px;
-            font-weight: 600;
-            line-height: 1;
-        }
-
-        /* Property Color Variants */
-        .property-taw {
-            background: linear-gradient(135deg, #e8f0e3 0%, #dfe7d9 100%);
-            border: none;
-            color: #6b8b63;
-        }
-
-        .property-carbon {
-            background: linear-gradient(135deg, #e8ebe8 0%, #dfe3d9 100%);
-            border: none;
-            color: #6b7b6e;
-        }
-
-        .property-cec {
-            background: linear-gradient(135deg, #f5ede4 0%, #f0e6d9 100%);
-            border: none;
-            color: #8b7559;
-        }
-
-        .property-ph {
-            background: linear-gradient(135deg, #f0e8e8 0%, #e8dfd9 100%);
-            border: none;
-            color: #7b6b6b;
-        }
-
-        .property-bd {
-            background: linear-gradient(135deg, #f0e6d9 0%, #e8dfd9 100%);
-            border: none;
-            color: #8b6b5b;
-        }
-
-        .property-sand {
-            background: linear-gradient(135deg, #f5d9d4 0%, #f0cdc9 100%);
-            border: none;
-            color: #8b5e53;
-        }
+        .property-taw    { background: linear-gradient(135deg, #e8f0e3, #dfe7d9); color: #6b8b63; }
+        .property-carbon { background: linear-gradient(135deg, #e8ebe8, #dfe3d9); color: #6b7b6e; }
+        .property-cec    { background: linear-gradient(135deg, #f5ede4, #f0e6d9); color: #8b7559; }
+        .property-ph     { background: linear-gradient(135deg, #f0e8e8, #e8dfd9); color: #7b6b6b; }
+        .property-bd     { background: linear-gradient(135deg, #f0e6d9, #e8dfd9); color: #8b6b5b; }
+        .property-sand   { background: linear-gradient(135deg, #f5d9d4, #f0cdc9); color: #8b5e53; }
 
         .property-placeholder {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 40px 20px;
-            color: #9ca3af;
-            font-size: 16px;
-        }
-
-        .unit {
-            font-size: 0.6em;
-            font-weight: 600;
-            opacity: 0.75;
-            margin-left: 4px;
-            vertical-align: middle;
+            grid-column: 1 / -1; text-align: center; padding: 40px 20px;
+            color: #9ca3af; font-size: 16px;
         }
 
         /* ===========================
-           CLUSTER INFO
+           CLUSTER INFO CARD
            =========================== */
         .cluster-info {
             border: 2px solid #d4d9cf;
@@ -274,240 +235,191 @@
         }
 
         .cluster-label {
-            font-size: 12px;
-            font-weight: 700;
-            color: #8b7b6b;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            margin-bottom: 8px;
+            font-size: 12px; font-weight: 700; color: #8b7b6b;
+            text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px;
+        }
+        .cluster-info h3 { font-size: 20px; font-weight: 700; color: #5a5447; margin-bottom: 16px; }
+
+        .cluster-explanation-list { list-style: none; display: flex; flex-direction: column; gap: 8px; padding: 0; }
+        .cluster-explanation-list li { font-size: 14px; color: #6b6359; line-height: 1.6; }
+        .cluster-explanation-list span { font-weight: 600; color: #5a5447; }
+
+        /* Analytics inside zone card */
+        .analytics-divider { border: none; border-top: 2px solid #dedad4; margin: 20px 0 14px; }
+
+        .analytics-section-title {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.7px; color: #8b7b6b; margin-bottom: 12px;
         }
 
-        .cluster-info h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #5a5447;
-            margin-bottom: 16px;
-        }
+        /* Feature averages chart */
+        .feature-avg-wrapper { position: relative; width: 100%; height: 220px; margin-bottom: 4px; }
 
-        .cluster-explanation-list {
-            list-style: none;
-            space-y: 12px;
-        }
+        /* SHAP section */
+        .shap-toggle-row { display: flex; gap: 6px; margin-bottom: 12px; flex-wrap: wrap; }
 
-        .cluster-explanation-list li {
-            font-size: 14px;
-            text-align: left;
-            color: #6b6359;
-            line-height: 1.6;
-            margin-bottom: 12px;
-        }
-
-        .cluster-explanation-list span {
+        .shap-toggle-btn {
+            padding: 5px 12px;
+            border-radius: 20px;
+            border: 2px solid #d4dfc9;
+            background: #fefdfb;
+            font-family: 'Raleway';
+            font-size: 11px;
             font-weight: 600;
             color: #5a5447;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
         }
+        .shap-toggle-btn:hover { border-color: #3e6e06; }
+        .shap-toggle-btn.active { background: #3e6e06; border-color: #3e6e06; color: white; }
+
+        .shap-chart-wrapper { position: relative; width: 100%; height: 200px; }
 
         /* ===========================
-           CHART CONTAINER
+           SOIL COMPARISON CHART CARD
            =========================== */
-        .chart-container {
-            border: 2px solid #d4dfc9;
-            min-height: 320px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chart-container h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #5a5447;
-            margin-bottom: 16px;
-        }
-
-        .chart-wrapper {
-            position: relative;
-            flex: 1;
-            min-height: 280px;
-        }
-
-        #soilChart {
-            max-height: 280px;
-        }
+        .chart-container { border: 2px solid #d4dfc9; min-height: 320px; display: flex; flex-direction: column; }
+        .chart-container h3 { font-size: 18px; font-weight: 700; color: #5a5447; margin-bottom: 16px; }
+        .chart-wrapper { position: relative; flex: 1; min-height: 280px; }
+        #soilChart { max-height: 280px; }
 
         /* ===========================
            ALERTS
            =========================== */
         .alert {
-            padding: 16px 20px;
-            border-radius: 12px;
-            border: 2px solid;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 14px;
-            flex-shrink: 0;
+            padding: 16px 20px; border-radius: 12px; border: 2px solid;
+            font-weight: 500; display: none; align-items: center;
+            gap: 12px; font-size: 14px; flex-shrink: 0;
         }
+        .alert.show { display: flex; }
+        .alert-info  { background: #e8ebe8; border-color: #b8d4a8; color: #6b8b63; }
+        .alert-error { background: #f5d9d4; border-color: #d9b5a8; color: #8b5e53; }
 
-        .alert-info {
-            background: #e8ebe8;
-            border-color: #b8d4a8;
-            color: #6b8b63;
+        /* ===========================
+           MODAL
+           =========================== */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
         }
-
-
-        #loadingAlert {
-            display: none !important;
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 90%; max-width: 400px;
         }
-
-
-        .alert-error {
-            background: #f5d9d4;
-            border-color: #d9b5a8;
-            color: #8b5e53;
+        .modal-tabs { display: flex; gap: 0; margin-bottom: 24px; border-bottom: 2px solid #e8e4d9; }
+        .modal-tab {
+            flex: 1; padding: 12px; background: none; border: none;
+            border-bottom: 3px solid transparent; font-family: 'Raleway';
+            font-weight: 600; font-size: 14px; color: #9ca3af; cursor: pointer; transition: all 0.3s ease;
         }
+        .modal-tab.active { color: #3e6e06; border-bottom-color: #3e6e06; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; color: #5a5447; margin-bottom: 8px; font-size: 14px; }
+        .form-group input {
+            width: 100%; padding: 12px; border: 2px solid #d4dfc9; border-radius: 8px;
+            font-family: 'Raleway'; font-size: 14px; transition: border 0.3s ease;
+        }
+        .form-group input:focus { outline: none; border-color: #3e6e06; }
+
+        .modal-buttons { display: flex; gap: 12px; margin-top: 24px; }
+        .modal-buttons button {
+            flex: 1; padding: 12px; border: none; border-radius: 8px;
+            font-family: 'Raleway'; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+        }
+        .btn-primary  { background: #3e6e06; color: white; }
+        .btn-primary:hover { background: #2d5205; }
+        .btn-secondary { background: #e8e4d9; color: #5a5447; }
+        .btn-secondary:hover { background: #d4d0c5; }
+
+        .auth-toggle-link { text-align: center; margin-top: 16px; font-size: 14px; color: #5a5447; }
+        .auth-toggle-link a { color: #3e6e06; font-weight: 600; text-decoration: none; cursor: pointer; transition: color 0.3s ease; }
+        .auth-toggle-link a:hover { color: #2d5205; text-decoration: underline; }
+
+        .hidden { display: none !important; }
 
         /* ===========================
            BUTTONS
            =========================== */
         .btn {
-            padding: 16px 24px;
-            border-radius: 12px;
-            border: none;
-            font-family: 'Raleway';
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            text-decoration: none;
-            flex-shrink: 0;
+            padding: 16px 24px; border-radius: 12px; border: none; font-family: 'Raleway';
+            font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;
+            display: flex; align-items: center; justify-content: center;
+            gap: 10px; text-decoration: none; flex-shrink: 0;
         }
 
         .btn-predict {
             background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
-            color: white;
-            font-family: 'Raleway';
-            font-size: 18px;
-            padding: 20px 24px;
-            box-shadow: 0 10px 25px rgba(62, 110, 6, 0.25);
-            border: 2px solid transparent;
-            width: 100%;
+            color: white; font-family: 'Raleway'; font-size: 18px; padding: 20px 24px;
+            box-shadow: 0 10px 25px rgba(62,110,6,0.25); border: 2px solid transparent; width: 100%;
         }
-
-        .btn-predict:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(62, 110, 6, 0.35);
-        }
-
-        .btn-predict:active {
-            transform: translateY(0);
-        }
-
-        .btn-predict:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+        .btn-predict:hover  { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(62,110,6,0.35); }
+        .btn-predict:active { transform: translateY(0); }
+        .btn-predict:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* ===========================
-           RESPONSIVE DESIGN
+           RESPONSIVE
            =========================== */
         @media (max-width: 1024px) {
-            .main-content {
-                flex-direction: column;
-                gap: 16px;
-                padding: 16px;
-            }
-
-            .map-container {
-                height: 400px;
-            }
-
-            .properties-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .property-sand {
-                grid-column: 1;
-            }
+            .main-content { flex-direction: column; gap: 16px; padding: 16px; }
+            .map-container { height: 400px; }
+            .properties-grid { grid-template-columns: repeat(2, 1fr); }
         }
-
         @media (max-width: 640px) {
-            .header-content h1 {
-                font-size: 24px;
-            }
-
-            .header-content p {
-                font-size: 12px;
-            }
-
-            .main-content {
-                padding: 12px;
-                gap: 12px;
-            }
-
-            .card {
-                padding: 16px;
-                border-radius: 12px;
-            }
-
-            .card-header h2 {
-                font-size: 18px;
-            }
-
-            .property-box {
-                padding: 16px;
-            }
-
-            .property-value {
-                font-size: 24px;
-            }
-
-            .btn-predict {
-                padding: 16px 20px;
-                font-size: 16px;
-            }
-
-            .info-panel {
-                gap: 12px;
-            }
+            .header-content h1 { font-size: 24px; }
+            .header { flex-direction: column; gap: 16px; }
+            .main-content { padding: 12px; gap: 12px; }
+            .card { padding: 16px; border-radius: 12px; }
+            .card-header h2 { font-size: 18px; }
+            .property-value { font-size: 18px; }
+            .properties-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
         /* ===========================
-           ANIMATIONS
+           AUTH FEEDBACK
            =========================== */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .auth-feedback {
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            line-height: 1.5;
+        }
+        .auth-feedback.error {
+            background: #fdf0ee;
+            border: 1.5px solid #e8b4a8;
+            color: #8b3a2a;
+        }
+        .auth-feedback.success {
+            background: #edf5e8;
+            border: 1.5px solid #a8d4a0;
+            color: #2d6b20;
         }
 
-        .property-box {
-            animation: fadeIn 0.3s ease-out;
+        /* Sign out button in header */
+        .signout-button {
+            padding: 10px 20px;
+            background: transparent;
+            color: #e8f0e8;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 8px;
+            font-family: 'Raleway';
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .signout-button:hover {
+            background: rgba(255,255,255,0.15);
+            border-color: rgba(255,255,255,0.7);
         }
 
-        .card {
-            animation: fadeIn 0.4s ease-out;
-        }
-
-        /* ===========================
-           UTILITY CLASSES
-           =========================== */
-        .hidden {
-            display: none !important;
-        }
-
-        .visible {
-            display: block !important;
-        }
+        /* Input error highlight */
+        .input-error { border-color: #c0392b !important; }
     </style>
 </head>
 <body>
@@ -519,56 +431,128 @@
             <h1>Weather Prediction and Crop Recommendation System</h1>
             <p>Western Province, Sri Lanka</p>
         </div>
+        <div class="header-controls">
+            <span id="userInfo" class="user-info" style="display:none;">Welcome, <span id="userName"></span>!</span>
+            <button id="signOutBtn" class="signout-button" style="display:none;">Sign Out</button>
+            <button id="authBtn" class="auth-button">Sign In</button>
+        </div>
     </header>
 
     <!-- Main Content -->
     <div class="main-content">
+
         <!-- Left: Map -->
         <div class="map-container">
             <div id="map"></div>
-            <button class="map-button" id="clusterToggleBtn" style="display: none;">Show Western Province Soil Management Zone Map</button>
+            <button class="map-button" id="clusterToggleBtn">Show Cluster Map</button>
+            <!-- Floating legend -->
+            <div class="map-legend" id="mapLegend">
+                <div class="map-legend-title">Management Zones</div>
+                <div id="mapLegendItems"></div>
+            </div>
         </div>
 
         <!-- Right: Info Panel -->
         <div class="info-panel">
+
+            <!-- Model Selector -->
+            <div class="card">
+                <div class="card-header"><h2>Clustering Model</h2></div>
+                <select id="modelSelect" class="model-select">
+                    <option value="kmeans">K-Means</option>
+                    <option value="agglomerative">Agglomerative Clustering</option>
+                    <option value="gmm">Gaussian Mixture Model</option>
+                </select>
+            </div>
+
             <!-- Soil Properties -->
-            <div class="card soil-properties">
-                <div class="card-header">
-                    <h2>Soil Properties</h2>
-                </div>
+            <div class="card">
+                <div class="card-header"><h2>Soil Properties</h2></div>
                 <div class="properties-grid" id="propertiesGrid">
                     <div class="property-placeholder">Click on the map to see soil properties</div>
                 </div>
             </div>
 
-            <!-- Cluster Explanation -->
-            <div class="card cluster-info" id="clusterCard" style="display: none;">
+            <!-- Zone Explanation With Analytics -->
+            <div class="card cluster-info" id="clusterCard" style="display:none;">
+                <!-- Zone header -->
                 <div class="cluster-label" id="clusterLabel"></div>
                 <h3 id="zoneName"></h3>
                 <ul class="cluster-explanation-list" id="clusterList"></ul>
+
+                <!-- Feature Averages Grouped Bar Chart -->
+                <hr class="analytics-divider">
+                <div class="analytics-section-title">Feature Averages by Zone</div>
+                <div class="feature-avg-wrapper">
+                    <canvas id="featureAvgChart"></canvas>
+                </div>
+
+                <!-- SHAP Analysis -->
+                <hr class="analytics-divider">
+                <div class="analytics-section-title">SHAP Feature Importance</div>
+                <div class="shap-toggle-row" id="shapToggleRow">
+                    <button class="shap-toggle-btn active" data-shap-view="global">Global</button>
+                </div>
+                <div class="shap-chart-wrapper">
+                    <canvas id="shapChart"></canvas>
+                </div>
             </div>
 
-            <!-- Chart -->
-            <div class="card chart-container" id="chartCard" style="display: none;">
+            <!-- Soil Property Comparison Chart -->
+            <div class="card chart-container" id="chartCard" style="display:none;">
                 <h3>Soil Property Comparison</h3>
                 <div class="chart-wrapper">
                     <canvas id="soilChart"></canvas>
                 </div>
             </div>
 
-            <!-- Loading State -->
-            <div class="alert alert-info" id="loadingAlert" style="display: none;"></div>
-
-            <!-- Error State -->
-            <div class="alert alert-error" id="errorAlert" style="display: none;">
-                <span id="errorMessage"></span>
-            </div>
+            <!-- Alerts -->
+            <div class="alert alert-info"  id="loadingAlert"><span>Loading data...</span></div>
+            <div class="alert alert-error" id="errorAlert"><span id="errorMessage"></span></div>
 
             <!-- Predict Weather Button -->
-            <button class="btn btn-predict" id="predictBtn" style="display: none;">
-                Predict Weather
-            </button>
+            <button class="btn btn-predict" id="predictBtn" style="display:none;">Predict Weather</button>
         </div>
+    </div>
+</div>
+
+<!-- Auth Modal -->
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-mode="signin">Sign In</button>
+            <button class="modal-tab" data-mode="signup">Sign Up</button>
+        </div>
+        <form id="authForm" novalidate>
+            <div class="form-group hidden" id="nameGroup">
+                <label for="authName">Full Name</label>
+                <input id="authName" type="text">
+            </div>
+            <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email">
+            </div>
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input id="authPassword" type="password">
+            </div>
+            <div class="form-group hidden" id="confirmGroup">
+                <label for="authConfirm">Confirm Password</label>
+                <input id="authConfirm" type="password">
+            </div>
+            <!-- Inline feedback -->
+            <div id="authFeedback" class="auth-feedback hidden"></div>
+            <div class="modal-buttons">
+                <button type="submit" class="btn-primary" id="authSubmitBtn">Sign In</button>
+                <button type="button" class="btn-secondary" id="authCloseBtn">Cancel</button>
+            </div>
+            <div class="auth-toggle-link hidden" id="toggleLink">
+                Still not registered? <a href="#" onclick="toggleAuthMode(event)">Sign up now</a>
+            </div>
+            <div class="auth-toggle-link hidden" id="signinLink">
+                Already have an account? <a href="#" onclick="toggleAuthModeToSignin(event)">Sign in</a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -576,60 +560,143 @@
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <script>
-const API_BASE = "http://127.0.0.1:5000";
-
-// State
-let map = null;
-let chart = null;
-let clusterLayer = null;
-let clickedLocationMarker = null;
-let showingClusterMap = false;
-let currentSoilData = null;
-let currentClusterMeans = null;
-let currentClusterExplanation = null;
-
-// Constants
-const PROPERTY_UNITS = {
-    taw: "mm",
-    organic_carbon: "%",
-    cec: "cmol(+)/kg",
-    ph: "pH",
-    bulk_density: "g/cm³",
-    sand_pct: "%",
-};
+// ===========================
+// CONSTANTS
+// ===========================
+const API_BASE_URL = "http://localhost:5000";
 
 const PROPERTY_LABELS = {
-    taw: "Total Available Water (TAW)",
+    taw:            "Total Available Water",
     organic_carbon: "Organic Carbon",
-    cec: "Cation Exchange Capacity (CEC)",
-    ph: "pH",
-    bulk_density: "Bulk Density",
-    sand_pct: "Sand Percentage",
+    cec:            "CEC",
+    ph:             "pH",
+    bulk_density:   "Bulk Density",
+    sand_pct:       "Sand",
 };
 
-// Initialize app
-document.addEventListener('DOMContentLoaded', function() {
-    initializeMap();
-    setupEventListeners();
-});
+const PROPERTY_UNITS = {
+    taw:            "mm",
+    organic_carbon: "%",
+    cec:            "cmol/kg",
+    ph:             "pH",
+    bulk_density:   "g/cm³",
+    sand_pct:       "%",
+};
 
-// Setup event listeners
-function setupEventListeners() {
-    document.getElementById('clusterToggleBtn').addEventListener('click', toggleClusterVisualization);
-    document.getElementById('predictBtn').addEventListener('click', handlePredictWeather);
+// Zone colours
+const ZONE_COLORS       = ["#3e6e06", "#d2b452", "#c0392b", "#2980b9"];
+const ZONE_COLORS_ALPHA = [
+    "rgba(62,110,6,0.50)",
+    "rgba(210,180,82,0.50)",
+    "rgba(192,57,43,0.50)",
+    "rgba(41,128,185,0.50)"
+];
+
+const GRID_STEP = 0.009428; // degrees per grid cell
+
+const FEATURE_KEYS = ["taw", "organic_carbon", "cec", "ph", "sand_pct"];
+const FEATURE_LABELS_SHORT = {
+    taw:            "TAW (mm)",
+    organic_carbon: "OC (%)",
+    cec:            "CEC (cmol/kg)",
+    ph:             "pH (pH)",
+    sand_pct:       "Sand (%)"
+};
+
+const MODEL_KEY_MAP      = { kmeans: "kmeans", agglomerative: "agglomerative", gmm: "gmm" };
+const MODEL_SHAP_KEY_MAP = { kmeans: "K-Means", agglomerative: "Agglomerative", gmm: "GMM" };
+
+// ===========================
+// STATE
+// ===========================
+let map              = null;
+let soilChart        = null;    
+let featureAvgChart  = null;   
+let shapChart        = null;   
+let clusterLayer     = null;
+let clickedMarker    = null;
+let showingClusterMap = false;
+let currentModel     = "kmeans";
+let isLoggedIn       = false;
+let userName         = "";
+let currentLocation  = null;
+let currentClusterId = null;
+
+// JSON data
+let clusterPointsData = null;
+let clusterMeansData  = null;
+let shapData          = null;
+
+let currentShapView = "global"; 
+
+// ===========================
+// DATA LOADING
+// ===========================
+async function loadData() {
+    if (clusterPointsData && clusterMeansData && shapData) return true;
+    try {
+        const parseCSV = text => {
+            const [header, ...rows] = text.trim().split('\n');
+            const keys = header.split(',');
+            return rows.map(row => {
+                const vals = row.split(',');
+                const obj = {};
+                keys.forEach((k, i) => {
+                    obj[k.trim()] = k.trim() === 'cluster'
+                        ? parseInt(vals[i])
+                        : parseFloat(vals[i]);
+                });
+                return obj;
+            });
+        };
+
+        const [kmeansCsv, aggCsv, gmmCsv, means, shap] = await Promise.all([
+            fetch('web_cluster_points_kmeans.csv').then(r => r.text()),
+            fetch('web_cluster_points_agglomerative.csv').then(r => r.text()),
+            fetch('web_cluster_points_gmm.csv').then(r => r.text()),
+            fetch('web_cluster_means.json').then(r => r.json()),
+            fetch('web_shap.json').then(r => r.json())
+        ]);
+
+        clusterPointsData = {
+            kmeans:        parseCSV(kmeansCsv),
+            agglomerative: parseCSV(aggCsv),
+            gmm:           parseCSV(gmmCsv)
+        };
+        clusterMeansData = means;
+        shapData         = shap;
+        return true;
+    } catch (e) {
+        console.error("Failed to load data:", e);
+        return false;
+    }
 }
 
-// Initialize map
-function initializeMap() {
-    if (document.querySelector('#map')._leaflet_id) {
-        return; // Map already initialized
-    }
+// ===========================
+// INIT
+// ===========================
+document.addEventListener('DOMContentLoaded', function () {
+    initializeMap();
+    setupEventListeners();
+    loadData(); 
+    restoreSession(); 
+});
 
+function setupEventListeners() {
+    document.getElementById('modelSelect').addEventListener('change', handleModelChange);
+    document.getElementById('clusterToggleBtn').addEventListener('click', toggleClusterVisualization);
+    document.getElementById('predictBtn').addEventListener('click', handlePredictWeather);
+    document.getElementById('authBtn').addEventListener('click', openAuthModal);
+    document.getElementById('authCloseBtn').addEventListener('click', closeAuthModal);
+    document.getElementById('authForm').addEventListener('submit', handleAuth);
+    document.querySelectorAll('.modal-tab').forEach(tab => tab.addEventListener('click', switchAuthMode));
+    document.getElementById('signOutBtn').addEventListener('click', handleSignOut);
+}
+
+function initializeMap() {
+    if (map) return;
     map = L.map('map', {
-        maxBounds: [
-            [6.4, 79.7],
-            [7.3, 80.3]
-        ],
+        maxBounds: [[6.4, 79.7], [7.3, 80.3]],
         maxBoundsViscosity: 1.0
     }).setView([6.9, 79.9], 9);
 
@@ -637,167 +704,399 @@ function initializeMap() {
         attribution: "© OpenStreetMap contributors"
     }).addTo(map);
 
-    // Map click handler
-    map.on("click", async function(e) {
+    map.on("click", async function (e) {
         const lat = e.latlng.lat;
         const lon = e.latlng.lng;
 
-        // Check if click is within bounds
         if (lat < 6.4 || lat > 7.3 || lon < 79.7 || lon > 80.3) {
             showError("No soil data found for this location");
             clearData();
             return;
         }
 
+        currentLocation = { lat, lon };
         showLoading(true);
         hideError();
 
         try {
-            const response = await fetch(`${API_BASE}/soil?lat=${lat}&lon=${lon}`);
-            
-            if (!response.ok) {
-                showError("No soil data found for this location");
-                clearData();
-                return;
-            }
-
-            const data = await response.json();
-            currentSoilData = data.soil_properties;
-            currentClusterMeans = data.cluster_means;
-            currentClusterExplanation = data.cluster_explanation;
-            
-            displaySoilProperties(data.soil_properties);
-            displayClusterInfo(data.cluster_explanation, data.soil_properties.cluster);
-            drawChart(data.soil_properties, data.cluster_means);
-            
-            // Show cluster toggle and predict button
-            document.getElementById('clusterToggleBtn').style.display = 'block';
-            document.getElementById('predictBtn').style.display = 'flex';
-            
-            // Add marker for clicked location
-            if (clickedLocationMarker) {
-                map.removeLayer(clickedLocationMarker);
-            }
-            clickedLocationMarker = L.circleMarker([lat, lon], {
-                radius: 6,
-                fillColor: "#3e6e06",
-                color: "#1a3205",
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8,
-            });
-            clickedLocationMarker.addTo(map);
-
-            showLoading(false);
-
+            await fetchAndDisplaySoilData(lat, lon);
         } catch (err) {
-            showError("Error connecting to backend. Make sure the server is running.");
+            showError("Error loading data");
             clearData();
             showLoading(false);
         }
     });
 }
 
-// Display soil properties in separate boxes
-function displaySoilProperties(soil) {
-    const grid = document.getElementById('propertiesGrid');
+// ===========================
+// CLUSTER OVERLAY MAP
+// ===========================
 
-    grid.innerHTML = `
-        <div class="property-box property-taw">
-            <div class="property-label">${PROPERTY_LABELS.taw}</div>
-            <div class="property-value">
-                ${soil.taw.toFixed(2)}
-                <span class="unit">${PROPERTY_UNITS.taw}</span>
-            </div>
-        </div>
-
-        <div class="property-box property-carbon">
-            <div class="property-label">${PROPERTY_LABELS.organic_carbon}</div>
-            <div class="property-value">
-                ${soil.organic_carbon.toFixed(2)}
-                <span class="unit">${PROPERTY_UNITS.organic_carbon}</span>
-            </div>
-        </div>
-
-        <div class="property-box property-cec">
-            <div class="property-label">${PROPERTY_LABELS.cec}</div>
-            <div class="property-value">
-                ${soil.cec.toFixed(2)}
-                <span class="unit">${PROPERTY_UNITS.cec}</span>
-            </div>
-        </div>
-
-        <div class="property-box property-ph">
-            <div class="property-label">${PROPERTY_LABELS.ph}</div>
-            <div class="property-value">
-                ${soil.ph.toFixed(2)}
-                <span class="unit">${PROPERTY_UNITS.ph}</span>
-            </div>
-        </div>
-
-        <div class="property-box property-bd">
-            <div class="property-label">${PROPERTY_LABELS.bulk_density}</div>
-            <div class="property-value">
-                ${soil.bulk_density.toFixed(2)}
-                <span class="unit">${PROPERTY_UNITS.bulk_density}</span>
-            </div>
-        </div>
-
-        <div class="property-box property-sand">
-            <div class="property-label">${PROPERTY_LABELS.sand_pct}</div>
-            <div class="property-value">
-                ${soil.sand_pct.toFixed(2)}
-                <span class="unit">${PROPERTY_UNITS.sand_pct}</span>
-            </div>
-        </div>
-    `;
+// Parse hex colour → [r, g, b]
+function hexToRgb(hex) {
+    const r = parseInt(hex.slice(1,3), 16);
+    const g = parseInt(hex.slice(3,5), 16);
+    const b = parseInt(hex.slice(5,7), 16);
+    return [r, g, b];
 }
 
-// Display cluster explanation with bullet points
-function displayClusterInfo(explanation, cluster) {
-    document.getElementById('clusterLabel').innerHTML = `Zone ${cluster}`;
-    document.getElementById('zoneName').innerHTML = explanation.zone_name;
-    
-    const listHTML = `
+const ClusterCanvasLayer = L.Layer.extend({
+
+    initialize: function (points) {
+        this._points = points;
+    },
+
+    onAdd: function (map) {
+        this._map = map;
+
+        // Create canvas inside overlayPane
+        const pane = map.getPane('overlayPane');
+        this._canvas = document.createElement('canvas');
+        this._canvas.style.position        = 'absolute';
+        this._canvas.style.top             = '0';
+        this._canvas.style.left            = '0';
+        this._canvas.style.pointerEvents   = 'none'; 
+        this._canvas.style.zIndex          = '200';
+        pane.appendChild(this._canvas);
+
+        map.on('moveend zoomend resize', this._redraw, this);
+        this._redraw();
+    },
+
+    onRemove: function (map) {
+        map.off('moveend zoomend resize', this._redraw, this);
+        if (this._canvas && this._canvas.parentNode) {
+            this._canvas.parentNode.removeChild(this._canvas);
+        }
+        this._canvas = null;
+    },
+
+    _redraw: function () {
+        if (!this._canvas || !this._map) return;
+
+        const map    = this._map;
+        const size   = map.getSize();
+        const canvas = this._canvas;
+        canvas.width  = size.x;
+        canvas.height = size.y;
+
+        // Align canvas with the map's top-left pixel origin
+        const topLeft = map.containerPointToLayerPoint([0, 0]);
+        L.DomUtil.setPosition(canvas, topLeft);
+
+        const ctx  = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        const half = GRID_STEP / 2;
+
+        this._points.forEach(pt => {
+            const [r, g, b] = hexToRgb(ZONE_COLORS[pt.cluster % ZONE_COLORS.length]);
+
+            // Convert geo corners to pixel positions
+            const sw = map.latLngToContainerPoint(L.latLng(pt.lat - half, pt.lon - half));
+            const ne = map.latLngToContainerPoint(L.latLng(pt.lat + half, pt.lon + half));
+
+            const x = Math.min(sw.x, ne.x);
+            const y = Math.min(sw.y, ne.y);
+            const w = Math.abs(ne.x - sw.x) + 1;
+            const h = Math.abs(ne.y - sw.y) + 1;
+
+            ctx.fillStyle = `rgba(${r},${g},${b},0.50)`;
+            ctx.fillRect(x, y, w, h);
+        });
+    }
+});
+
+async function toggleClusterVisualization() {
+    const btn = document.getElementById('clusterToggleBtn');
+
+    if (showingClusterMap) {
+        if (clusterLayer) { map.removeLayer(clusterLayer); clusterLayer = null; }
+        document.getElementById('mapLegend').classList.remove('visible');
+        showingClusterMap = false;
+        btn.textContent = 'Show Cluster Map';
+        return;
+    }
+
+    const ok = await loadData();
+    if (!ok) {
+        showError("Could not load cluster data. Ensure JSON files are in the same folder as index.html.");
+        return;
+    }
+
+    renderMainMapOverlay();
+    showingClusterMap = true;
+    btn.textContent = 'Hide Cluster Map';
+}
+
+function renderMainMapOverlay() {
+    if (clusterLayer) { map.removeLayer(clusterLayer); clusterLayer = null; }
+
+    const modelKey = MODEL_KEY_MAP[currentModel];
+    const points   = clusterPointsData[modelKey];
+
+    clusterLayer = new ClusterCanvasLayer(points);
+    clusterLayer.addTo(map);
+
+    // Legend
+    const numZones = new Set(points.map(p => p.cluster)).size;
+    document.getElementById('mapLegendItems').innerHTML =
+        Array.from({ length: numZones }, (_, i) => `
+            <div class="map-legend-item">
+                <div class="map-legend-swatch" style="background:${ZONE_COLORS[i]};"></div>
+                Zone ${i}
+            </div>
+        `).join('');
+    document.getElementById('mapLegend').classList.add('visible');
+}
+
+// ===========================
+// FETCH & DISPLAY SOIL DATA
+// ===========================
+async function fetchAndDisplaySoilData(lat, lon) {
+    try {
+        const response = await fetch(
+            `${API_BASE_URL}/soil?lat=${lat}&lon=${lon}&model=${currentModel}`
+        );
+        if (!response.ok) throw new Error("No soil data found for this location");
+
+        const data = await response.json();
+
+        displaySoilProperties(data.soil_properties);
+        currentClusterId = data.soil_properties.cluster;
+
+        displayClusterInfo(data.cluster_explanation, currentClusterId);
+        drawSoilComparisonChart(data.soil_properties, data.cluster_means);
+
+        // Place marker coloured by zone
+        if (clickedMarker) map.removeLayer(clickedMarker);
+        clickedMarker = L.circleMarker([lat, lon], {
+            radius:      9,
+            color:       '#fff',
+            weight:      2.5,
+            fillColor:   ZONE_COLORS[currentClusterId % ZONE_COLORS.length],
+            fillOpacity: 1
+        }).addTo(map);
+
+        document.getElementById('predictBtn').style.display = 'flex';
+        showLoading(false);
+
+    } catch (error) {
+        showError(error.message);
+        clearData();
+        showLoading(false);
+    }
+}
+
+// ===========================
+// SOIL PROPERTIES DISPLAY
+// ===========================
+function displaySoilProperties(soil) {
+    const grid = document.getElementById('propertiesGrid');
+    const properties = [
+        { key: "taw",            cls: "property-taw"    },
+        { key: "organic_carbon", cls: "property-carbon" },
+        { key: "cec",            cls: "property-cec"    },
+        { key: "ph",             cls: "property-ph"     },
+        { key: "bulk_density",   cls: "property-bd"     },
+        { key: "sand_pct",       cls: "property-sand"   },
+    ];
+
+    grid.innerHTML = properties.map(prop => `
+        <div class="property-box ${prop.cls}">
+            <div class="property-label">${PROPERTY_LABELS[prop.key]}</div>
+            <div class="property-value">
+                ${soil[prop.key] != null ? soil[prop.key].toFixed(2) : '—'}
+                <span class="unit">${PROPERTY_UNITS[prop.key]}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===========================
+// ZONE EXPLANATION With ANALYTICS
+// ===========================
+function displayClusterInfo(explanation, clusterId) {
+    document.getElementById('clusterLabel').textContent = `Zone ${clusterId}`;
+    document.getElementById('zoneName').textContent     = explanation.zone_name;
+    document.getElementById('clusterList').innerHTML = `
         <li><span>Water Behavior:</span> ${explanation.water_behavior}</li>
         <li><span>Nutrient Strength:</span> ${explanation.nutrient_strength}</li>
         <li><span>Acidity:</span> ${explanation.acidity}</li>
     `;
-    document.getElementById('clusterList').innerHTML = listHTML;
-
     document.getElementById('clusterCard').style.display = 'block';
+
+    // Draw analytics once JSON is ready
+    loadData().then(ok => {
+        if (!ok) return;
+        drawFeatureAvgChart();
+        buildShapToggleButtons();
+        drawShapChart(currentShapView);
+    });
 }
 
-// Draw comparison chart
-function drawChart(soil, clusterMeans) {
-    const canvasElement = document.getElementById("soilChart");
-    if (!canvasElement) return;
+// ---- Feature Averages: grouped bar chart ----
+function drawFeatureAvgChart() {
+    if (featureAvgChart) { featureAvgChart.destroy(); featureAvgChart = null; }
 
-    if (chart) {
-        chart.destroy();
-    }
+    const modelKey = MODEL_KEY_MAP[currentModel];
+    const means    = clusterMeansData[modelKey];
+    const numZones = Object.keys(means.taw).length;
 
-    const ctx = canvasElement.getContext("2d");
+    const datasets = Array.from({ length: numZones }, (_, zIdx) => ({
+        label:           `Zone ${zIdx}`,
+        data:            FEATURE_KEYS.map(fk => means[fk] ? (means[fk][zIdx] ?? 0) : 0),
+        backgroundColor: ZONE_COLORS_ALPHA[zIdx % ZONE_COLORS_ALPHA.length],
+        borderColor:     ZONE_COLORS[zIdx % ZONE_COLORS.length],
+        borderWidth:     1.5,
+        borderRadius:    4,
+        borderSkipped:   false,
+    }));
 
-    const labels = ["TAW", "Organic Carbon", "CEC", "pH", "Bulk Density", "Sand %"];
-    const pointValues = [soil.taw, soil.organic_carbon, soil.cec, soil.ph, soil.bulk_density, soil.sand_pct];
-    const clusterValues = [clusterMeans.taw, clusterMeans.organic_carbon, clusterMeans.cec, clusterMeans.ph, clusterMeans.bulk_density, clusterMeans.sand_pct];
+    featureAvgChart = new Chart(
+        document.getElementById('featureAvgChart').getContext('2d'),
+        {
+            type: 'bar',
+            data: {
+                labels:   FEATURE_KEYS.map(k => FEATURE_LABELS_SHORT[k]),
+                datasets
+            },
+            options: {
+                responsive:          true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 10,
+                            font: { size: 11, family: 'Raleway', weight: '600' }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ` Zone ${ctx.datasetIndex}: ${ctx.parsed.y.toFixed(3)}`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { font: { size: 11, family: 'Raleway' } } },
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { font: { size: 10, family: 'Segoe UI' } }
+                    }
+                }
+            }
+        }
+    );
+}
 
-    chart = new Chart(ctx, {
+// ---- SHAP toggle buttons ----
+function buildShapToggleButtons() {
+    const modelShapKey = MODEL_SHAP_KEY_MAP[currentModel];
+    const shapClusters = (shapData[modelShapKey] && shapData[modelShapKey].clusters)
+        ? Object.keys(shapData[modelShapKey].clusters)
+        : [];
+
+    const row = document.getElementById('shapToggleRow');
+    row.innerHTML = `<button class="shap-toggle-btn${currentShapView === 'global' ? ' active' : ''}" data-shap-view="global">Global</button>`;
+
+    shapClusters.forEach(zId => {
+        const isActive = currentShapView === zId;
+        row.innerHTML += `<button class="shap-toggle-btn${isActive ? ' active' : ''}" data-shap-view="${zId}">Zone ${zId}</button>`;
+    });
+
+    row.querySelectorAll('.shap-toggle-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentShapView = btn.dataset.shapView;
+            row.querySelectorAll('.shap-toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            drawShapChart(currentShapView);
+        });
+    });
+}
+
+// ---- SHAP horizontal bar chart ----
+function drawShapChart(view) {
+    if (shapChart) { shapChart.destroy(); shapChart = null; }
+
+    const modelShapKey = MODEL_SHAP_KEY_MAP[currentModel];
+    if (!shapData || !shapData[modelShapKey]) return;
+
+    const values = view === 'global'
+        ? shapData[modelShapKey].global
+        : shapData[modelShapKey].clusters[view];
+    if (!values) return;
+
+    // Sort descending
+    const sorted = Object.keys(values)
+        .map(f => ({ f, v: values[f] }))
+        .sort((a, b) => b.v - a.v);
+
+    shapChart = new Chart(
+        document.getElementById('shapChart').getContext('2d'),
+        {
+            type: 'bar',
+            data: {
+                labels:   sorted.map(s => FEATURE_LABELS_SHORT[s.f] || s.f),
+                datasets: [{
+                    label:           view === 'global' ? 'Global Importance' : `Zone ${view}`,
+                    data:            sorted.map(s => s.v),
+                    backgroundColor: sorted.map((_, i) => ZONE_COLORS_ALPHA[i % ZONE_COLORS_ALPHA.length]),
+                    borderColor:     sorted.map((_, i) => ZONE_COLORS[i % ZONE_COLORS.length]),
+                    borderWidth:     1.5,
+                    borderRadius:    4,
+                    borderSkipped:   false,
+                }]
+            },
+            options: {
+                indexAxis:           'y',   // horizontal bars
+                responsive:          true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.x.toFixed(4)}` } }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        grid: { color: 'rgba(0,0,0,0.05)' },
+                        ticks: { font: { size: 10, family: 'Segoe UI' } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { size: 11, family: 'Raleway', weight: '600' } }
+                    }
+                }
+            }
+        }
+    );
+}
+
+// ===========================
+// SOIL COMPARISON CHART
+// ===========================
+function drawSoilComparisonChart(soil, clusterMeans) {
+    const canvas = document.getElementById("soilChart");
+    if (!canvas) return;
+    if (soilChart) { soilChart.destroy(); soilChart = null; }
+
+    soilChart = new Chart(canvas.getContext("2d"), {
         type: "bar",
         data: {
-            labels: labels,
+            labels: ["TAW (mm)", "OC (%)", "CEC (cmol/kg)", "pH (pH)", "BD (g/cm³)", "Sand (%)"],
             datasets: [
                 {
                     label: "Selected Location",
-                    data: pointValues,
+                    data: [soil.taw, soil.organic_carbon, soil.cec, soil.ph, soil.bulk_density, soil.sand_pct],
                     backgroundColor: "#3e6e06",
                     borderRadius: 6,
                     borderSkipped: false,
                 },
                 {
                     label: "Zone Average",
-                    data: clusterValues,
+                    data: [clusterMeans.taw, clusterMeans.organic_carbon, clusterMeans.cec, clusterMeans.ph, clusterMeans.bulk_density, clusterMeans.sand_pct],
                     backgroundColor: "#d2b452",
                     borderRadius: 6,
                     borderSkipped: false,
@@ -806,32 +1105,16 @@ function drawChart(soil, clusterMeans) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: "bottom",
-                    labels: {
-                        usePointStyle: true,
-                        padding: 15,
-                        font: {
-                            size: 12,
-                            weight: "500"
-                        }
-                    }
+                    labels: { usePointStyle: true, padding: 15, font: { size: 12, weight: "500" } }
                 }
             },
             scales: {
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: "rgba(0, 0, 0, 0.05)"
-                    }
-                },
-                x: {
-                    grid: {
-                        display: false
-                    }
-                }
+                y: { beginAtZero: true, grid: { color: "rgba(0,0,0,0.05)" } },
+                x: { grid: { display: false } }
             }
         }
     });
@@ -839,124 +1122,270 @@ function drawChart(soil, clusterMeans) {
     document.getElementById('chartCard').style.display = 'block';
 }
 
-// Toggle cluster visualization
-async function toggleClusterVisualization() {
-    if (showingClusterMap) {
-        // Hide cluster visualization
-        if (clusterLayer) {
-            map.removeLayer(clusterLayer);
-            clusterLayer = null;
-        }
-        showingClusterMap = false;
-        document.getElementById('clusterToggleBtn').textContent = 'Show Cluster Map';
+// ===========================
+// MODEL CHANGE
+// ===========================
+function handleModelChange(e) {
+    currentModel    = e.target.value;
+    currentShapView = "global";
+
+    if (showingClusterMap) renderMainMapOverlay();
+
+    if (currentLocation) {
+        showLoading(true);
+        hideError();
+        fetchAndDisplaySoilData(currentLocation.lat, currentLocation.lon).catch(() => {
+            showError("Error loading data for new model");
+            showLoading(false);
+        });
     } else {
-        // Show cluster visualization
-        try {
-            showLoading(true);
-
-            const response = await fetch(`${API_BASE}/clusters`);
-
-            if (!response.ok) {
-                throw new Error('Failed to fetch cluster data');
-            }
-
-            const clusterData = await response.json();
-            clusterLayer = L.layerGroup();
-
-            const clusterColors = [
-                "#3e6e06", 
-                "#d2b452",
-                "#a57f18",
-                "#806e34",
-                "#665521",
-                "#1a3205",
-            ];
-
-            // Plot clusters from database
-            clusterData.clusters.forEach((zone, idx) => {
-                const circle = L.circle([zone.latitude, zone.longitude], {
-                    radius: zone.radius || 5000,
-                    fillColor: clusterColors[idx % clusterColors.length],
-                    color: clusterColors[idx % clusterColors.length],
-                    weight: 2,
-                    opacity: 0.4,
-                    fillOpacity: 0.2,
-                });
-
-                const popup = L.popup().setContent(
-                    `<div style="font-family: Raleway; font-weight: bold;">Management Zone ${zone.cluster_id}</div>`
-                );
-                circle.bindPopup(popup);
-                circle.addTo(clusterLayer);
-            });
-
-            clusterLayer.addTo(map);
-            showingClusterMap = true;
-            document.getElementById('clusterToggleBtn').textContent = 'Show Satellite Map';
-            showLoading(false);
-        } catch (err) {
-            showError('Failed to load cluster data from database');
-            console.error('Cluster loading error:', err);
-            showLoading(false);
-        }
+        clearData();
     }
 }
 
-// Show loading alert
-function showLoading(show) {
-    const loadingAlert = document.getElementById('loadingAlert');
-    if (show) {
-        loadingAlert.style.display = 'flex';
-    } else {
-        loadingAlert.style.display = 'none';
-    }
-}
+// ===========================
+// UTILS
+// ===========================
+function showLoading(show) { document.getElementById('loadingAlert').classList.toggle('show', show); }
+function showError(msg)    { document.getElementById('errorMessage').textContent = `⚠️ ${msg}`; document.getElementById('errorAlert').classList.add('show'); }
+function hideError()       { document.getElementById('errorAlert').classList.remove('show'); }
 
-// Show error alert
-function showError(message) {
-    const errorAlert = document.getElementById('errorAlert');
-    const errorMessage = document.getElementById('errorMessage');
-    errorMessage.innerHTML = `⚠️ ${message}`;
-    errorAlert.style.display = 'flex';
-}
-
-// Hide error alert
-function hideError() {
-    document.getElementById('errorAlert').style.display = 'none';
-}
-
-// Clear all data
 function clearData() {
-    currentSoilData = null;
-    currentClusterMeans = null;
-    currentClusterExplanation = null;
-    
-    document.getElementById('propertiesGrid').innerHTML = '<div class="property-placeholder">Click on the map to see soil properties</div>';
+    currentLocation  = null;
+    currentClusterId = null;
+    document.getElementById('propertiesGrid').innerHTML =
+        '<div class="property-placeholder">Click on the map to see soil properties</div>';
     document.getElementById('clusterCard').style.display = 'none';
-    document.getElementById('chartCard').style.display = 'none';
-    document.getElementById('clusterToggleBtn').style.display = 'none';
-    document.getElementById('predictBtn').style.display = 'none';
-    
-    if (chart) {
-        chart.destroy();
-        chart = null;
-    }
-    
-    if (clickedLocationMarker) {
-        map.removeLayer(clickedLocationMarker);
-        clickedLocationMarker = null;
-    }
-    
-    if (clusterLayer) {
-        map.removeLayer(clusterLayer);
-        clusterLayer = null;
-        showingClusterMap = false;
+    document.getElementById('chartCard').style.display   = 'none';
+    document.getElementById('predictBtn').style.display  = 'none';
+    if (clickedMarker)   { map.removeLayer(clickedMarker); clickedMarker = null; }
+    if (featureAvgChart) { featureAvgChart.destroy(); featureAvgChart = null; }
+    if (shapChart)       { shapChart.destroy(); shapChart = null; }
+}
+
+// ===========================
+// AUTH — localStorage-backed
+// ===========================
+
+// ------- helpers -------
+function getUsers() {
+    return JSON.parse(localStorage.getItem('wp_users') || '{}');
+}
+function saveUsers(users) {
+    localStorage.setItem('wp_users', JSON.stringify(users));
+}
+function getSession() {
+    return JSON.parse(localStorage.getItem('wp_session') || 'null');
+}
+function saveSession(user) {
+    localStorage.setItem('wp_session', JSON.stringify(user));
+}
+function clearSession() {
+    localStorage.removeItem('wp_session');
+}
+
+// ------- feedback helpers -------
+function showAuthFeedback(msg, type) {       
+    const el = document.getElementById('authFeedback');
+    el.textContent = msg;
+    el.className = 'auth-feedback ' + type;
+    el.classList.remove('hidden');
+}
+function clearAuthFeedback() {
+    const el = document.getElementById('authFeedback');
+    el.className = 'auth-feedback hidden';
+    el.textContent = '';
+}
+function markInputError(id) {
+    document.getElementById(id).classList.add('input-error');
+}
+function clearInputErrors() {
+    document.querySelectorAll('.input-error').forEach(el => el.classList.remove('input-error'));
+}
+
+// ------- modal open/close -------
+function openAuthModal() {
+    clearAuthFeedback();
+    clearInputErrors();
+    document.getElementById('authForm').reset();
+    document.getElementById('authModal').classList.add('show');
+}
+function closeAuthModal() {
+    document.getElementById('authModal').classList.remove('show');
+    clearAuthFeedback();
+    clearInputErrors();
+}
+
+// ------- tab switching -------
+let currentAuthMode = 'signin';
+
+function switchAuthMode(e) {
+    const mode = e.target.dataset.mode;
+    currentAuthMode = mode;
+    clearAuthFeedback();
+    clearInputErrors();
+
+    document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+    e.target.classList.add('active');
+
+    const nameGroup    = document.getElementById('nameGroup');
+    const confirmGroup = document.getElementById('confirmGroup');
+    const toggleLink   = document.getElementById('toggleLink');
+    const signinLink   = document.getElementById('signinLink');
+    const submitBtn    = document.getElementById('authSubmitBtn');
+
+    if (mode === 'signup') {
+        nameGroup.classList.remove('hidden');
+        confirmGroup.classList.remove('hidden');
+        toggleLink.classList.add('hidden');
+        signinLink.classList.remove('hidden');
+        submitBtn.textContent = 'Sign Up';
+    } else {
+        nameGroup.classList.add('hidden');
+        confirmGroup.classList.add('hidden');
+        toggleLink.classList.remove('hidden');
+        signinLink.classList.add('hidden');
+        submitBtn.textContent = 'Sign In';
     }
 }
 
-// Handle predict weather button
+function toggleAuthMode(e) {
+    e.preventDefault();
+    document.querySelector('[data-mode="signup"]').click();
+}
+
+function toggleAuthModeToSignin(e) {
+    e.preventDefault();
+    document.querySelector('[data-mode="signin"]').click();
+}
+
+// ------- sign-up -------
+function handleSignUp(name, email, password, confirm) {
+    clearInputErrors();
+
+    if (!name.trim()) {
+        markInputError('authName');
+        showAuthFeedback('Please enter your full name.', 'error');
+        return;
+    }
+    if (!email.trim() || !/^[^@]+@[^@]+\.[^@]+$/.test(email)) {
+        markInputError('authEmail');
+        showAuthFeedback('Please enter a valid email address.', 'error');
+        return;
+    }
+    if (password.length < 6) {
+        markInputError('authPassword');
+        showAuthFeedback('Password must be at least 6 characters.', 'error');
+        return;
+    }
+    if (password !== confirm) {
+        markInputError('authPassword');
+        markInputError('authConfirm');
+        showAuthFeedback('Passwords do not match.', 'error');
+        return;
+    }
+
+    const users = getUsers();
+    if (users[email.toLowerCase()]) {
+        markInputError('authEmail');
+        showAuthFeedback('An account with this email already exists. Please sign in.', 'error');
+        return;
+    }
+
+    // Store
+    users[email.toLowerCase()] = { name: name.trim(), email: email.toLowerCase(), password };
+    saveUsers(users);
+
+    showAuthFeedback('Account created! Signing you in…', 'success');
+    setTimeout(() => {
+        applySignedInState({ name: name.trim(), email: email.toLowerCase() });
+    }, 900);
+}
+
+// ------- sign-in -------
+function handleSignIn(email, password) {
+    clearInputErrors();
+
+    if (!email.trim()) {
+        markInputError('authEmail');
+        showAuthFeedback('Please enter your email address.', 'error');
+        return;
+    }
+    if (!password) {
+        markInputError('authPassword');
+        showAuthFeedback('Please enter your password.', 'error');
+        return;
+    }
+
+    const users = getUsers();
+    const user  = users[email.toLowerCase()];
+
+    if (!user) {
+        markInputError('authEmail');
+        showAuthFeedback('No account found with this email. Please sign up.', 'error');
+        // Show the toggle link
+        document.getElementById('toggleLink').classList.remove('hidden');
+        return;
+    }
+    if (user.password !== password) {
+        markInputError('authPassword');
+        showAuthFeedback('Incorrect password. Please try again.', 'error');
+        return;
+    }
+
+    showAuthFeedback('Welcome back, ' + user.name.split(' ')[0] + '!', 'success');
+    setTimeout(() => {
+        applySignedInState({ name: user.name, email: user.email });
+    }, 700);
+}
+
+// ------- apply signed-in UI -------
+function applySignedInState(user) {
+    saveSession(user);
+    userName   = user.name.split(' ')[0];
+    isLoggedIn = true;
+
+    document.getElementById('userInfo').style.display   = 'block';
+    document.getElementById('userName').textContent     = userName;
+    document.getElementById('authBtn').style.display    = 'none';
+    document.getElementById('signOutBtn').style.display = 'block';
+    closeAuthModal();
+}
+
+// ------- sign-out -------
+function handleSignOut() {
+    clearSession();
+    isLoggedIn = false;
+    userName   = '';
+
+    document.getElementById('userInfo').style.display   = 'none';
+    document.getElementById('authBtn').style.display    = 'block';
+    document.getElementById('signOutBtn').style.display = 'none';
+}
+
+// ------- form submit router -------
+function handleAuth(e) {
+    e.preventDefault();
+    const name     = document.getElementById('authName').value.trim();
+    const email    = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const confirm  = document.getElementById('authConfirm').value;
+
+    if (currentAuthMode === 'signup') {
+        handleSignUp(name, email, password, confirm);
+    } else {
+        handleSignIn(email, password);
+    }
+}
+
+// ------- restore session on load -------
+function restoreSession() {
+    const session = getSession();
+    if (session) applySignedInState(session);
+}
+
 function handlePredictWeather() {
-    alert('Weather prediction feature coming soon!');
+    alert('Weather prediction');
     // Thirusha
 }
 </script>
