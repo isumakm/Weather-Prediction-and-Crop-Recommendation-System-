@@ -1,12 +1,7 @@
 __pycache__/
 .ipynb_checkpoints/
-
 .env
 
-*.csv
-*.tif
-*.json
-*.png
+soil_suitability/data/
 
-data/
-outputs/
+soil_suitability/outputs/
