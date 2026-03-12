@@ -118,7 +118,7 @@ def mock_service_data():
 
 @pytest.fixture
 def client():
-    from backend.app import app
+    from backend.soil_app import app
     app.config["TESTING"] = True
     with app.test_client() as c:
         yield c
@@ -150,7 +150,7 @@ def sample_input_df():
 # ==========================================================================
 
 def test_app_is_created():
-    from backend.app import app
+    from backend.soil_app import app
     assert app is not None
 
 
@@ -171,7 +171,7 @@ def test_cors_enabled_on_error_response(client):
 
 
 def test_blueprint_registered():
-    from backend.app import app
+    from backend.soil_app import app
     assert "soil" in app.blueprints
 
 
@@ -180,7 +180,7 @@ def test_soil_route_reachable_via_blueprint(client):
 
 
 def test_app_run_is_callable():
-    from backend.app import app
+    from backend.soil_app import app
     import inspect
     sig = inspect.signature(app.run)
     assert "debug" in sig.parameters
