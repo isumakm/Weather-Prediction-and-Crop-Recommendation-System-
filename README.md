@@ -1,20 +1,16 @@
-# 🌾 Weather Prediction and Crop Recommendation System
+# React + Vite
 
-## 📝 Project Overview
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-### The Challenge: Climate Vulnerability in Sri Lanka's Western Province
+Currently, two official plugins are available:
 
-The Western Province, covering Colombo, Gampaha, and Kalutara districts, faces distinct and escalating climate challenges that threaten agricultural productivity and food security:
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-* **Colombo District:** While drought is uncommon, untimely rainfall during traditionally dry months (February to mid-March) disrupts flowering cycles in valuable fruit crops like rambutan, mangosteen, and avocado. Excessive rainfall and frequent flooding pose significant threats to agricultural activities throughout the region.
-* **Gampaha District:** Characterized by flat terrain ideal for fruit cultivation, this district suffers from intense rains during the first inter-monsoon (April) and southwest monsoon (May to mid-July). These downpours adversely affect fruit yields, block drainage systems, and cause flash floods that impact paddy cultivation in river floodplains.
-* **Kalutara District:** Heavily affected by torrential rainfall, this district's low-lying areas face regular flooding from the overflowing Kalu Ganga, particularly during the southwest monsoon and when weather systems develop in the Bay of Bengal (October to early January).
+## React Compiler
 
-### Our Solution: An Integrated Climate Intelligence Platform
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-This system provides data-driven, climate-resilient agricultural decision support specifically tailored to the Western Province's unique challenges. By integrating high-resolution weather forecasting, detailed soil analysis, and crop science, we help farmers and agricultural officers:
+## Expanding the ESLint configuration
 
-* Anticipate climate risks before they impact crops
-* Select appropriate crops and varieties based on soil resilience characteristics
-* Implement timely adaptations to mitigate weather-related losses
-* Optimize resource allocation for sustainable productivity
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
