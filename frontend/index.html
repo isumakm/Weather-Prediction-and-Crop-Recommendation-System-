@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgriTech Forecast | Multi-Crop Ranking</title>
+    <!-- Modern Typography: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-effect"></div>
+    <div class="background-effect effect-2"></div>
+    
+    <main class="container">
+        <header class="header">
+            <h1>AgriTech <span class="highlight">Forecast</span></h1>
+            <p class="subtitle">Predict the perfect crop using advanced Weather and Soil models.</p>
+        </header>
+
+        <section class="card glassmorphism main-card">
+            <form id="recommendation-form" class="form-layout">
+                <div class="input-group">
+                    <label for="location">Location (Mandatory)</label>
+                    <input type="text" id="location" name="location" placeholder="e.g. Kandy, Sri Lanka" required>
+                </div>
+                
+                <div class="input-group">
+                    <label for="date">Date (Mandatory)</label>
+                    <input type="date" id="date" name="date" required>
+                </div>
+
+                <div class="input-group">
+                    <label for="crop">Crop (Optional)</label>
+                    <input type="text" id="crop" name="crop" placeholder="e.g. Rice">
+                    <small class="hint">Leave empty for Multi-Crop Ranking</small>
+                </div>
+
+                <button type="submit" class="btn-primary" id="submit-btn">
+                    <span class="btn-text">Analyze Suitability</span>
+                    <span class="loader hidden" id="spinner"></span>
+                </button>
+            </form>
+        </section>
+
+        <!-- Results Section Container -->
+        <section id="result-container" class="results hidden">
+            <!-- Dynamic Content will be injected here -->
+        </section>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>
