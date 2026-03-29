@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Suitability Report</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Raleway', sans-serif;
+            background: #f5f0e8;
+            color: #3a3228;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .n {
+            font-family: 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif !important;
+        }
+
+        /* -- PAGE WRAPPER --- */
+        .page {
+            width: 794px;
+            min-height: 1123px;
+            margin: 20px auto;
+            background: white;
+            padding: 52px 60px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+        }
+
+        /* -- HEADER --- */
+        .report-header {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            padding: 18px 22px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .report-header h1 {
+            font-size: 19px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            margin-bottom: 3px;
+        }
+        .report-header .subtitle {
+            font-size: 11px;
+            color: #d4e8c0;
+            font-weight: 500;
+        }
+        .report-header .meta {
+            text-align: right;
+            font-size: 10px;
+            color: #d4e8c0;
+            font-weight: 500;
+            line-height: 1.8;
+        }
+
+        /* -- SECTION TITLE --- */
+        .section-title {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #7a6e5e;
+            border-bottom: 1.5px solid #e8e4d9;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+            margin-top: 16px;
+        }
+
+        /* -- RESULT BANNER --- */
+        .result-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #f5f0e8;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 4px;
+        }
+        .crop-name-tag {
+            font-size: 22px;
+            font-weight: 800;
+            color: #3e6e06;
+        }
+        .verdict-badge {
+            padding: 5px 18px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .verdict-suitable   { background: #3e6e06; color: white; }
+        .verdict-unsuitable { background: #b91c1c; color: white; }
+        .prob-wrap { margin-left: auto; text-align: right; }
+        .prob-label { font-size: 9px; font-weight: 700; text-transform: uppercase; color: #8b7b6b; letter-spacing: 0.06em; }
+        .prob-value-big { font-size: 26px; font-weight: 800; color: #3e6e06; line-height: 1; }
+
+        /* -- GAUGE --- */
+        .gauge-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+        .gauge-bar { flex: 1; height: 8px; background: #e8e4d9; border-radius: 4px; overflow: hidden; }
+        .gauge-fill { height: 100%; background: linear-gradient(90deg, #d2b452, #3e6e06); border-radius: 4px; }
+        .interp-box {
+            background: #f0f4e8;
+            border-left: 3px solid #3e6e06;
+            border-radius: 0 6px 6px 0;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #3a3228;
+        }
+
+        /* -- DATA GRIDS --- */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+        .data-cell {
+            background: #f9f7f4;
+            border: 1px solid #e8e4d9;
+            border-radius: 7px;
+            padding: 8px 10px;
+        }
+        .data-cell .dc-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #8b7b6b;
+            margin-bottom: 3px;
+        }
+        .data-cell .dc-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #3a3228;
+        }
+
+        /* -- SOIL FULL TABLE --- */
+        .soil-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .soil-table tr { border-bottom: 1px solid #f0ede7; }
+        .soil-table tr:last-child { border-bottom: none; }
+        .soil-table td { padding: 5px 8px; }
+        .soil-table td:first-child { color: #7a6e5e; font-weight: 600; width: 44%; }
+        .soil-table td:last-child  { font-weight: 700; color: #3a3228; }
+
+        /* -- ZONE PROFILE --- */
+        .zone-name-badge {
+            display: inline-block;
+            background: #eef4e8;
+            border: 1.5px solid #b5d490;
+            color: #3e6e06;
+            font-weight: 700;
+            font-size: 12px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+        }
+        .zone-row {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 6px;
+            margin-bottom: 6px;
+            align-items: start;
+        }
+        .zone-key {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #8b7b6b;
+            padding-top: 2px;
+        }
+        .zone-val {
+            font-size: 11.5px;
+            color: #4a4036;
+            line-height: 1.55;
+        }
+
+        /* -- FACTORS TABLE --- */
+        .factors-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11.5px;
+        }
+        .factors-table thead tr {
+            background: #f5f0e8;
+        }
+        .factors-table th {
+            padding: 6px 8px;
+            text-align: left;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #7a6e5e;
+        }
+        .factors-table td { padding: 5px 8px; border-bottom: 1px solid #f0ede7; }
+        .factors-table tr:last-child td { border-bottom: none; }
+        .f-optimal { color: #3e6e06; font-weight: 700; }
+        .f-marginal { color: #b45309; font-weight: 700; }
+        .f-outside  { color: #b91c1c; font-weight: 700; }
+
+        /* -- FOOTER --- */
+        .report-footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1.5px solid #e8e4d9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 9px;
+            color: #b0a898;
+            font-weight: 600;
+        }
+
+        /* -- PRINT BUTTON (screen only) --- */
+        .print-bar {
+            width: 794px;
+            margin: 0 auto 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .btn-print {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #3e6e06, #665521);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .btn-print:hover { opacity: 0.9; }
+        .btn-back {
+            padding: 10px 20px;
+            background: transparent;
+            color: #5a5447;
+            border: 2px solid #d4dfc9;
+            border-radius: 8px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .btn-back:hover { border-color: #3e6e06; color: #3e6e06; }
+        .print-tip {
+            font-size: 12px;
+            color: #8b7b6b;
+            font-weight: 500;
+        }
+
+        /* -- PRINT MEDIA --- */
+        @media print {
+            body { background: white; font-size: 12px; }
+            .print-bar { display: none; }
+            .page {
+                width: 100%;
+                margin: 0;
+                padding: 12mm 14mm;
+                box-shadow: none;
+            }
+            @page { margin: 0; size: A4; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Print button bar -->
+<div class="print-bar">
+    <button class="btn-print" id="downloadBtn" onclick="downloadPDF()">Download</button>
+    <button class="btn-back"  onclick="window.close()">Back</button>
+</div>
+
+<!-- Report page -->
+<div class="page" id="reportPage">
+
+    <!-- Header -->
+    <div class="report-header">
+        <div>
+            <h1>Crop Suitability Report</h1>
+            <div class="subtitle">Weather Prediction &amp; Crop Recommendation System - Western Province, Sri Lanka</div>
+        </div>
+        <div class="meta">
+            <div id="metaGenerated">-</div>
+            <div id="metaDistrict">-</div>
+            <div id="metaSeason">-</div>
+        </div>
+    </div>
+
+    <!-- Prediction result -->
+    <div class="section-title">Prediction Result</div>
+    <div class="result-banner">
+        <div>
+            <div class="crop-name-tag" id="rCropName">-</div>
+            <div style="margin-top:6px">
+                <span class="verdict-badge" id="rVerdict">-</span>
+            </div>
+        </div>
+        <div class="prob-wrap">
+            <div class="prob-label">Suitability Probability</div>
+            <div class="prob-value-big" id="rProb">-</div>
+        </div>
+    </div>
+    <div class="gauge-row" style="margin-top:8px">
+        <div class="gauge-bar"><div class="gauge-fill" id="rGauge" style="width:0%"></div></div>
+    </div>
+    <div class="interp-box" id="rInterp">-</div>
+
+    <!-- Weather conditions -->
+    <div class="section-title">Weather Conditions</div>
+    <div class="data-grid">
+        <div class="data-cell">
+            <div class="dc-label">Temperature</div>
+            <div class="dc-value" id="wTemp">-</div>
+        </div>
+        <div class="data-cell">
+            <div class="dc-label">Rainfall</div>
+            <div class="dc-value" id="wRain">-</div>
+        </div>
+        <div class="data-cell">
+            <div class="dc-label">Sunshine Hours</div>
+            <div class="dc-value" id="wSun">-</div>
+        </div>
+    </div>
+
+    <!-- Soil properties -->
+    <div class="section-title">Soil Properties</div>
+    <table class="soil-table">
+        <tr><td>pH</td><td id="sPH">-</td></tr>
+        <tr><td>Organic Carbon</td><td id="sOC">-</td></tr>
+        <tr><td>Cation Exchange Capacity (CEC)</td><td id="sCEC">-</td></tr>
+        <tr><td>Available Water Capacity (AWC)</td><td id="sAWC">-</td></tr>
+        <tr><td>Bulk Density</td><td id="sBD">-</td></tr>
+        <tr><td>Total Available Water (TAW)</td><td id="sTAW">-</td></tr>
+        <tr><td>Sand Content</td><td id="sSand">-</td></tr>
+        <tr><td>Texture Class</td><td id="sTexture">-</td></tr>
+
+    </table>
+
+    <!-- Soil zone profile -->
+    <div id="zoneSection" style="display:none">
+        <div class="section-title">Soil Zone Profile</div>
+        <div class="zone-name-badge" id="zZoneName">-</div>
+        <div class="zone-row">
+            <div class="zone-key">Water Behavior</div>
+            <div class="zone-val" id="zWater">-</div>
+        </div>
+        <div class="zone-row">
+            <div class="zone-key">Nutrient Strength</div>
+            <div class="zone-val" id="zNutrient">-</div>
+        </div>
+        <div class="zone-row">
+            <div class="zone-key">Acidity</div>
+            <div class="zone-val" id="zAcidity">-</div>
+        </div>
+    </div>
+
+    <!-- Factor status -->
+    <div id="factorSection" style="display:none">
+        <div class="section-title">Factor Status vs Optimal Ranges</div>
+        <table class="factors-table">
+            <thead>
+                <tr>
+                    <th>Factor</th>
+                    <th>Your Value</th>
+                    <th>Optimal Range</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="factorTableBody"></tbody>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div class="report-footer">
+        <span>Weather Prediction &amp; Crop Recommendation System - Western Province, Sri Lanka</span>
+        <span id="footerDate">-</span>
+    </div>
+
+</div>
+
+<script>
+// -- FACTOR THRESHOLD TABLE ---------------------
+const FACTOR_THRESHOLDS = {
+    'Temperature':    [3,     3,     3,    3    ],
+    'Rainfall':       [150,   150,   300,  300  ],
+    'Sunshine Hours': [1,     1,     1,    1    ],
+    'Soil pH':        [0.5,   0.5,   0.5,  0.5  ],
+    'Organic Carbon': [0.3,   0.3,   0.5,  1.0  ],
+    'CEC':            [3,     3,     5,    10   ],
+    'AWC':            [0.005, 0.005, null, null ],
+    'Bulk Density':   [0.1,   0.1,   0.1,  0.1  ],
+};
+
+// -- CROP RANGES -------------------------------
+const CROP_RANGES = {
+    'Banana':        [16.845,37.662,  688.073,2783.694,  3.583,9.165,  4.852,7.724,  0.921,3.476,  7.467,36.115,  0.013,0.043,  0.949,1.617],
+    'Bitter Gourd':  [18.91,35.707,   352.423,2335.13,   4.875,9.472,  4.916,7.408,  0.907,3.299,  9.807,33.606,  0.012,0.042,  1.011,1.587],
+    'Brinjal':       [17.992,34.915,  329.708,2363.786,  4.822,9.12,   5.085,7.805,  1.109,3.531,  11.922,36.093, 0.014,0.042,  0.998,1.638],
+    'Capsicum':      [17.236,33.532,  360.075,2520.776,  4.467,8.951,  4.91,7.426,   1.519,3.574,  10.302,37.463, 0.016,0.04,   0.944,1.582],
+    'Cucumber':      [18.496,37.285,  401.265,2176.611,  4.347,9.208,  5.062,7.525,  0.994,3.362,  9.569,35.7,    0.014,0.042,  1.057,1.659],
+    'Ginger':        [17.642,36.108,  523.601,2365.717,  3.816,9.281,  4.95,7.644,   0.811,3.267,  8.164,35.266,  0.013,0.041,  0.984,1.641],
+    'Kiriala':       [17.445,34.105,  676.376,1803.931,  3.135,8.811,  4.736,7.347,  0.99,3.628,   10.792,35.772, 0.013,0.041,  0.967,1.633],
+    'Luffa':         [16.791,35.964,  661.24,2536.206,   4.425,9.274,  4.946,7.482,  0.937,3.566,  10.392,34.557, 0.014,0.041,  0.953,1.599],
+    'Mangosteen':    [18.902,37.836,  370.751,2570.254,  3.764,8.992,  4.994,7.614,  0.84,3.579,   9.39,35.487,   0.015,0.039,  1.001,1.615],
+    'Manioc':        [17.884,37.079,  575.807,2633.191,  4.063,9.231,  4.945,7.643,  1.04,3.211,   7.228,35.8,    0.015,0.042,  1.023,1.57],
+    'Okra':          [19.068,37.863,  341.613,2473.147,  3.932,9.538,  4.911,7.542,  0.992,3.363,  12.195,30.541, 0.018,0.041,  0.981,1.577],
+    'Papaya':        [18.525,37.838,  665.649,2410.529,  4.23,9.416,   4.916,7.594,  0.936,3.48,   9.94,34.575,   0.014,0.04,   0.982,1.651],
+    'Passion Fruit': [19.354,38.462,  725.516,2841.267,  3.777,8.905,  4.836,7.557,  1.272,3.467,  8.629,36.822,  0.013,0.042,  0.945,1.553],
+    'Pineapple':     [19.401,37.072,  1070.874,2755.364, 3.868,9.629,  4.991,7.616,  1.024,3.691,  8.48,35.717,   0.014,0.041,  0.971,1.586],
+    'Radish':        [19.033,32.014,  327.34,2748.182,   4.443,8.194,  5.495,7.527,  0.882,3.287,  6.688,25.777,  0.015,0.037,  0.983,1.606],
+    'Rambutan':      [19.355,35.489,  468.098,2687.637,  4.407,9.516,  4.961,7.616,  1.041,3.776,  9.346,34.48,   0.013,0.038,  0.971,1.6],
+    'Snake Gourd':   [21.936,37.853,  301.089,2205.21,   4.043,9.211,  4.704,7.503,  1.041,3.447,  8.397,33.635,  0.015,0.038,  1.037,1.582],
+    'Sweet Potato':  [22.225,37.906,  388.725,2254.348,  4.151,9.453,  4.716,7.498,  0.675,3.136,  10.695,37.25,  0.012,0.034,  1.077,1.637],
+    'Turmeric':      [17.685,36.39,   712.615,2623.64,   3.384,8.599,  4.874,7.668,  0.774,3.41,   8.616,37.581,  0.014,0.04,   1.008,1.625],
+    'Yams':          [18.188,36.822,  519.712,2588.548,  4.28,9.469,   4.924,7.654,  0.871,3.498,  7.405,36.029,  0.015,0.041,  0.969,1.637],
+    'Yard Long Bean':[17.382,37.058,  445.336,2673.926,  5.519,9.378,  4.738,7.558,  0.893,3.292,  8.259,33.787,  0.013,0.04,   1.021,1.573],
+};
+
+function evalFactor(value, min, max, name, highIsGood) {
+    if (value >= min && value <= max) return 'optimal';
+    if (highIsGood && value > max)    return 'optimal';
+    const t = FACTOR_THRESHOLDS[name];
+    if (!t) {
+        const buf = (max - min) * 0.20;
+        return (value >= min - buf && value <= max + buf) ? 'marginal' : 'outside';
+    }
+    const [warnLo, badLo, warnHi, badHi] = t;
+    if (value < min) {
+        return (min - value) <= warnLo ? 'marginal' : 'outside';
+    } else {
+        if (highIsGood || warnHi === null) return 'optimal';
+        return (value - max) <= warnHi ? 'marginal' : 'outside';
+    }
+}
+
+// -- LOAD DATA ---------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    if (!sessionStorage.getItem('entered_system')) {
+        window.location.href = 'landing.html';
+        return;
+    }
+    let soil, weather, zoneExpl, reportState;
+    try {
+        // All data is passed via URL parameter by crop.html
+        const raw = decodeURIComponent(new URLSearchParams(window.location.search).get('data') || '');
+        if (raw) {
+            const payload = JSON.parse(raw);
+            reportState = payload.state;
+            soil        = payload.soil;
+            weather     = payload.weather;
+            zoneExpl    = payload.zoneExpl;
+        }
+    } catch(e) { console.error('Report data parse error:', e); }
+
+    if (!soil || !weather || !reportState) {
+        document.getElementById('reportPage').innerHTML =
+            '<p style="padding:40px;color:#b91c1c;font-size:14px;">⚠ Report data not found. Please generate a suitability report first from the crop page.</p>';
+        return;
+    }
+
+    const { crop, prob, prediction, interp } = reportState;
+    const now = new Date();
+
+    // Header meta
+    document.getElementById('metaGenerated').textContent = 'Generated: ' + now.toLocaleString();
+    document.getElementById('metaDistrict').textContent  = 'District: ' + (weather.district || '-');
+    document.getElementById('metaSeason').textContent    = 'Season: ' + (weather.season || '-');
+    document.getElementById('footerDate').textContent    = now.toLocaleDateString();
+    document.title = `Crop Report - ${crop}`;
+
+    // Result banner
+    document.getElementById('rCropName').textContent = crop;
+    const badge = document.getElementById('rVerdict');
+    badge.textContent = prediction;
+    badge.className = 'verdict-badge ' + (prediction === 'Suitable' ? 'verdict-suitable' : 'verdict-unsuitable');
+    document.getElementById('rProb').textContent    = (prob * 100).toFixed(1) + '%';
+    document.getElementById('rGauge').style.width   = (prob * 100) + '%';
+    document.getElementById('rInterp').textContent  = interp;
+
+    // Weather
+    document.getElementById('wTemp').textContent = weather.temperature_C.toFixed(2) + ' °C';
+    document.getElementById('wRain').textContent = weather.rainfall_mm.toFixed(2)   + ' mm';
+    document.getElementById('wSun').textContent  = weather.sunshine_h.toFixed(1)    + ' h';
+
+    // Soil
+    const s = soil;
+    document.getElementById('sPH').textContent      = s.ph            != null ? s.ph.toFixed(2)                      : '-';
+    document.getElementById('sOC').textContent      = s.organic_carbon!= null ? s.organic_carbon.toFixed(2) + ' %'  : '-';
+    document.getElementById('sCEC').textContent     = s.cec           != null ? s.cec.toFixed(2) + ' cmol/kg'        : '-';
+    document.getElementById('sAWC').textContent     = s.awc           != null ? s.awc.toFixed(4) + ' mm/mm'          : '-';
+    document.getElementById('sBD').textContent      = s.bulk_density  != null ? s.bulk_density.toFixed(3) + ' g/cm³' : '-';
+    document.getElementById('sTAW').textContent     = s.taw           != null ? s.taw.toFixed(2) + ' mm'             : '-';
+    document.getElementById('sSand').textContent    = s.sand_pct      != null ? s.sand_pct.toFixed(1) + ' %'         : '-';
+    document.getElementById('sTexture').textContent = s.texture_class || '-';
+
+
+    // Zone profile
+    if (zoneExpl) {
+        document.getElementById('zoneSection').style.display = 'block';
+        document.getElementById('zZoneName').textContent  = zoneExpl.zone_name      || '-';
+        document.getElementById('zWater').textContent     = zoneExpl.water_behavior  || '-';
+        document.getElementById('zNutrient').textContent  = zoneExpl.nutrient_strength || '-';
+        document.getElementById('zAcidity').textContent   = zoneExpl.acidity         || '-';
+    }
+
+    // Factor status table
+    const r = CROP_RANGES[crop];
+    if (r) {
+        document.getElementById('factorSection').style.display = 'block';
+        const [tMin,tMax,rMin,rMax,sMin,sMax,pMin,pMax,ocMin,ocMax,
+               ceMin,ceMax,awMin,awMax,bdMin,bdMax] = r;
+
+        const checks = [
+            { name:'Temperature',    v: weather.temperature_C, mn:tMin,  mx:tMax,  u:'°C',      hi:false },
+            { name:'Rainfall',       v: weather.rainfall_mm,   mn:rMin,  mx:rMax,  u:'mm',      hi:false },
+            { name:'Sunshine Hours', v: weather.sunshine_h,    mn:sMin,  mx:sMax,  u:'h/day',   hi:false },
+            { name:'Soil pH',        v: s.ph,                  mn:pMin,  mx:pMax,  u:'',        hi:false },
+            { name:'Organic Carbon', v: s.organic_carbon,      mn:ocMin, mx:ocMax, u:'%',       hi:true  },
+            { name:'CEC',            v: s.cec,                 mn:ceMin, mx:ceMax, u:'cmol/kg', hi:true  },
+            { name:'AWC',            v: s.awc,                 mn:awMin, mx:awMax, u:'mm/mm',   hi:true  },
+            { name:'Bulk Density',   v: s.bulk_density,        mn:bdMin, mx:bdMax, u:'g/cm³',   hi:false },
+        ];
+
+        const tbody = document.getElementById('factorTableBody');
+        checks.forEach(c => {
+            const status = evalFactor(c.v, c.mn, c.mx, c.name, c.hi);
+            const icon   = status === 'optimal' ? '✔' : status === 'marginal' ? '⚠' : '✘';
+            const cls    = status === 'optimal' ? 'f-optimal' : status === 'marginal' ? 'f-marginal' : 'f-outside';
+            const valStr = c.u ? `${c.v.toFixed(c.u === 'mm/mm' ? 4 : 2)} ${c.u}` : c.v.toFixed(2);
+            const rngStr = c.hi ? `≥ ${c.mn} ${c.u}` : `${c.mn} – ${c.mx} ${c.u}`;
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${c.name}</td>
+                <td>${valStr}</td>
+                <td style="color:#7a6e5e">${rngStr}</td>
+                <td class="${cls}">${icon} ${status.charAt(0).toUpperCase() + status.slice(1)}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    applyNumericFont(document.getElementById('reportPage'));
+});
+
+// -- PDF DOWNLOAD -----------------------------------------------------
+function downloadPDF() {
+    const btn      = document.getElementById('downloadBtn');
+    const printBar = document.querySelector('.print-bar');
+
+    function restore() {
+        printBar.style.visibility = '';
+        btn.disabled    = false;
+        btn.textContent = 'Download';
+    }
+
+    btn.disabled    = true;
+    btn.textContent = 'Generating\u2026';
+    printBar.style.visibility = 'hidden';
+
+    const crop     = document.getElementById('rCropName').textContent || 'report';
+    const filename = 'suitability_report_' + crop.replace(/\s+/g, '_') + '.pdf';
+    const element  = document.getElementById('reportPage');
+
+    // Pixel dimensions of the rendered element
+    const W = element.offsetWidth;
+    const H = element.offsetHeight;
+
+    html2canvas(element, {
+        scale:        2,
+        useCORS:      true,
+        logging:      false,
+        x:            0,
+        y:            0,
+        scrollX:      -window.scrollX,
+        scrollY:      -window.scrollY,
+        width:        W,
+        height:       H,
+        windowWidth:  document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
+    }).then(canvas => {
+        const { jsPDF } = window.jspdf;
+
+        // 1px = 0.75pt - PDF page matches element dimensions
+        const pdf = new jsPDF({
+            orientation: W > H ? 'landscape' : 'portrait',
+            unit: 'pt',
+            format: [W * 0.75, H * 0.75]
+        });
+
+        const imgData = canvas.toDataURL('image/jpeg', 0.98);
+        pdf.addImage(imgData, 'JPEG', 0, 0, W * 0.75, H * 0.75);
+        pdf.save(filename);
+        restore();
+    }).catch(err => {
+        console.error('PDF generation failed:', err);
+        restore();
+    });
+}
+
+// -- NUMERIC FONT -----------------------------------------------------
+function applyNumericFont(root) {
+    root = root || document.body;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            const tag = node.parentNode && node.parentNode.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+            if (node.parentNode.classList && node.parentNode.classList.contains('n')) return NodeFilter.FILTER_REJECT;
+            return /\d/.test(node.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+        const parts = node.textContent.split(/([\d][\d.,]*)/);
+        if (parts.length <= 1) return;
+        const frag = document.createDocumentFragment();
+        parts.forEach(part => {
+            if (!part) return;
+            if (/^\d/.test(part)) {
+                const s = document.createElement('span');
+                s.className = 'n';
+                s.textContent = part;
+                frag.appendChild(s);
+            } else {
+                frag.appendChild(document.createTextNode(part));
+            }
+        });
+        node.parentNode.replaceChild(frag, node);
+    });
+}
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</body>
+</html>

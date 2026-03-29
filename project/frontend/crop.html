@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Recommendation - Western Province, Sri Lanka</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #f5ede4 0%, #faf8f3 50%, #f0f4e8 100%);
+            color: #5a5447;
+            overflow: hidden;
+        }
+
+        .n {
+            font-family: 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif !important;
+        }
+
+        /* -- APP SHELL ----------------------------------------------- */
+        .app-container { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+        /* -- HEADER -------------------------------------------------- */
+        .header {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            padding: 22px 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header-content h1 { font-size: 26px; font-weight: 700; margin-bottom: 3px; }
+        .header-content p  { font-size: 13px; color: #e8f0e8; font-weight: 500; }
+        .header-controls   { display: flex; gap: 16px; align-items: center; }
+
+        .auth-button {
+            padding: 9px 20px;
+            background: #d2b452;
+            color: #1a3205;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .auth-button:hover { background: #a57f18; }
+
+        .signout-button {
+            padding: 9px 20px;
+            background: transparent;
+            color: #e8f0e8;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 8px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .signout-button:hover { background: rgba(255,255,255,0.15); }
+
+        .user-info { color: #e8f0e8; font-weight: 600; font-size: 14px; }
+
+        /* -- PAGE BODY ----------------------------------------------- */
+        .page-body {
+            flex: 1;
+            min-height: 0;
+            padding: 16px 24px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: hidden;
+        }
+
+        /* -- BREADCRUMB ---------------------------------------------- */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #8b7b6b;
+            flex-shrink: 0;
+        }
+        .breadcrumb a { color: #3e6e06; text-decoration: none; transition: color 0.2s; }
+        .breadcrumb a:hover { color: #2d5205; text-decoration: underline; }
+        .breadcrumb-sep { color: #c4b89a; }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #3e6e06;
+            border-left: 5px solid #d2b452;
+            padding-left: 12px;
+            flex-shrink: 0;
+        }
+
+        /* -- MISSING DATA WARNING ------------------------------------ */
+        .no-data-box {
+            background: #fffbe8;
+            border: 2px solid #e0cc7a;
+            color: #7a6010;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+        .no-data-box a { color: #3e6e06; font-weight: 700; text-decoration: none; }
+        .no-data-box a:hover { text-decoration: underline; }
+
+        /* -- 2 PANELS ------------------------------------------------ */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* -- LEFT PANEL ----------------------------------------------- */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* -- RIGHT PANEL ---------------------------------------------- */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
+        }
+        .right-panel::-webkit-scrollbar { width: 5px; }
+        .right-panel::-webkit-scrollbar-track { background: transparent; }
+        .right-panel::-webkit-scrollbar-thumb { background: #d4dfc9; border-radius: 10px; }
+
+        /* -- SHARED CARD ---------------------------------------------- */
+        .card {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+            flex-shrink: 0;
+        }
+        .card.env-card { flex: 0 0 auto; display: flex; flex-direction: column; }
+
+        .env-groups-wrap {
+            display: flex;
+            flex-direction: column; gap: 6px;
+        }
+
+        .card-title {
+            font-size: 11px; font-weight: 700; color: #665521;
+            text-transform: uppercase; letter-spacing: 0.07em;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+        }
+        .sys-tag {
+            background: #d2b452; color: #1a3205; font-size: 10px; font-weight: 700;
+            padding: 2px 8px; border-radius: 20px; text-transform: uppercase;
+            letter-spacing: 0.05em; margin-left: auto;
+        }
+
+        /* -- ENV DATA ------------------------------------------------- */
+        .env-group {
+            background: #f0f4e8; border-radius: 10px;
+            padding: 8px 12px; border-left: 3px solid #3e6e06; flex-shrink: 0;
+        }
+        .env-group.soil { flex: 0 0 auto; }
+
+        .env-group-title {
+            font-size: 10px; font-weight: 700; color: #3e6e06;
+            text-transform: uppercase; letter-spacing: 0.07em;
+            margin-bottom: 6px; flex-shrink: 0;
+        }
+        .env-metrics-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px 8px; align-content: start;
+        }
+        .env-metric { display: flex; flex-direction: column; gap: 1px; }
+        .env-metrics-grid .env-metric {
+            background: rgba(255,255,255,0.55); border-radius: 6px; padding: 5px 8px;
+        }
+        .env-metric .val { font-size: 12px; font-weight: 700; color: #3e6e06; line-height: 1.2; }
+        .env-metric .key { font-size: 9px; color: #999; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+        .env-source { font-size: 10px; color: #bbb; font-style: italic; margin-top: 4px; flex-shrink: 0; }
+
+        /* -- CROP SELECT ---------------------------------------------- */
+        .crop-select {
+            width: 100%; padding: 9px 12px;
+            border: 2px solid #d4dfc9; border-radius: 10px;
+            font-family: 'Raleway', sans-serif; font-size: 14px; font-weight: 600;
+            color: #5a5447; background: #faf8f3;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23665521' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat; background-position: right 12px center;
+            cursor: pointer; transition: border-color 0.3s;
+        }
+        .crop-select:focus { outline: none; border-color: #3e6e06; }
+
+        /* -- ACTION BUTTON -------------------------------------------- */
+        .btn-action {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white; font-family: 'Raleway', sans-serif;
+            font-size: 14px; font-weight: 700; border-radius: 12px;
+            padding: 13px 20px; border: none; width: 100%; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 8px 20px rgba(62,110,6,0.25); flex-shrink: 0;
+        }
+        .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(62,110,6,0.35); }
+        .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* -- RIGHT: PLACEHOLDER --------------------------------------- */
+        .right-placeholder {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: space-evenly;
+            padding: 28px 36px;
+            background: rgba(255,255,255,0.5); backdrop-filter: blur(10px);
+            border-radius: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            text-align: center; min-height: 0;
+        }
+        .placeholder-icon { font-size: 56px; opacity: 0.3; }
+        .placeholder-title { font-size: 17px; font-weight: 700; color: #665521; margin-bottom: 4px; }
+        .placeholder-steps {
+            display: flex; flex-direction: column; gap: 14px; margin-top: 10px;
+            text-align: left; max-width: 360px; width: 100%;
+        }
+        .placeholder-step {
+            display: flex; align-items: flex-start; gap: 14px;
+            font-size: 13px; color: #7a6e5e; font-weight: 500; line-height: 1.55;
+            background: rgba(255,255,255,0.6); border-radius: 12px; padding: 12px 14px;
+        }
+        .step-num {
+            background: #3e6e06; color: white; min-width: 24px; height: 24px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 800;
+        }
+
+        /* -- RIGHT: CROP LIST ----------------------------------------- */
+        .result-card {
+            background: rgba(255,255,255,0.80); backdrop-filter: blur(10px);
+            border-radius: 16px; padding: 20px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+        }
+        .result-card-title { font-size: 14px; font-weight: 700; color: #3e6e06; margin-bottom: 12px; }
+
+        .crop-list { display: flex; flex-direction: column; gap: 8px; }
+        .crop-list-item {
+            display: flex; align-items: center; gap: 12px;
+            padding: 9px 12px; background: #f5f0e8;
+            border-radius: 10px; cursor: pointer;
+            transition: all 0.2s ease; font-size: 14px; font-weight: 600;
+        }
+        .crop-list-item:hover { background: #e8f0d8; transform: translateX(3px); }
+        .crop-list-item.selected { background: #d4e8c0; border-left: 4px solid #3e6e06; }
+        .crop-rank {
+            background: #3e6e06; color: white; min-width: 24px; height: 24px;
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 800;
+        }
+        .suit-pill { margin-left: auto; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .pill-high { background: #d1fae5; color: #065f46; }
+        .pill-med  { background: #fef3c7; color: #92400e; }
+        .pill-low  { background: #fee2e2; color: #991b1b; }
+
+        /* -- RIGHT: SUITABILITY REPORT -------------------------------- */
+        .report-top {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #f0f4e8;
+        }
+        .report-top h3 { font-size: 16px; font-weight: 700; color: #3e6e06; }
+        .crop-tag { background: #d2b452; color: #1a3205; font-weight: 700; font-size: 13px; padding: 5px 14px; border-radius: 20px; }
+        .result-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+        .result-label { font-weight: 600; font-size: 14px; color: #5a5447; }
+        .result-badge { display: inline-block; padding: 6px 22px; border-radius: 50px; font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; }
+        .badge-suitable   { background: #3e6e06; color: white; }
+        .badge-unsuitable { background: #b91c1c; color: white; }
+        .gauge-label { font-size: 11px; color: #999; margin-bottom: 5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }
+        .probability-gauge { background: #e8e4d9; height: 14px; border-radius: 8px; overflow: hidden; margin-bottom: 5px; }
+        .gauge-fill { height: 100%; background: linear-gradient(90deg, #d2b452, #3e6e06); width: 0%; transition: width 0.6s ease; }
+        .prob-value { text-align: right; font-size: 13px; font-weight: 700; color: #665521; margin-bottom: 14px; }
+        .interpretation { font-size: 13px; font-weight: 500; color: #5a5447; text-align: center; padding: 10px; background: #f0f4e8; border-radius: 10px; margin-bottom: 16px; line-height: 1.5; }
+        
+        /* -- Limiting Factors section ------------------------------- */
+        .factors-title {
+            font-size: 12px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.07em; color: #665521; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .factors-title span { font-size: 14px; }
+
+        .factors-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+
+        .factor-item {
+            display: flex; align-items: flex-start; gap: 10px;
+            background: #f5f0e8; border-radius: 10px; padding: 9px 12px;
+            border-left: 4px solid #d4dfc9;
+        }
+        .factor-item.fi-good    { background: #edf6e8; border-left-color: #3e6e06; }
+        .factor-item.fi-warning { background: #fef8ec; border-left-color: #d97706; }
+        .factor-item.fi-bad     { background: #fdf0ee; border-left-color: #b91c1c; }
+
+        .factor-icon { font-size: 15px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+
+        .factor-body { flex: 1; min-width: 0; }
+        .factor-name {
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.05em; color: #5a5447; margin-bottom: 2px;
+        }
+        .factor-detail {
+            font-size: 12px; color: #7a6e5e; line-height: 1.5; font-weight: 500;
+        }
+        .factor-detail strong { color: #3e6e06; font-weight: 700; }
+        .factor-detail.advisory { color: #92400e; }
+        .factor-detail.critical { color: #9b1c1c; }
+
+        .factors-all-good {
+            display: flex; align-items: center; gap: 10px;
+            background: #edf6e8; border-radius: 10px; padding: 12px 14px;
+            font-size: 13px; font-weight: 600; color: #3e6e06; margin-bottom: 16px;
+        }
+
+        .status-good    { color: #3e6e06; font-weight: 700; font-size: 12px; }
+        .status-warning { color: #b45309; font-weight: 700; font-size: 12px; }
+        .status-bad     { color: #b91c1c; font-weight: 700; font-size: 12px; }
+        .status         { font-weight: 700; }
+        .status-good    { color: #3e6e06; }
+        .status-warning { color: #b45309; }
+        .status-bad     { color: #b91c1c; }
+        .btn-download {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            padding: 11px 20px; background: linear-gradient(135deg, #d2b452, #a57f18);
+            color: #1a3205; border: none; border-radius: 12px;
+            font-family: 'Raleway', sans-serif; font-size: 14px; font-weight: 700;
+            cursor: pointer; transition: all 0.3s; width: 100%; box-shadow: 0 6px 18px rgba(210,180,82,0.3);
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(210,180,82,0.4); }
+
+        /* -- LOADING SPINNER ------------------------------------------ */
+        .spinner-row { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 20px; color: #3e6e06; font-weight: 600; font-size: 14px; }
+        .spinner {
+            width: 22px; height: 22px; border: 3px solid #d4dfc9;
+            border-top-color: #3e6e06; border-radius: 50%; animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* -- AUTH MODAL ----------------------------------------------- */
+        .modal { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 36px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
+        .modal-tabs { display: flex; margin-bottom: 22px; border-bottom: 2px solid #e8e4d9; }
+        .modal-tab { flex: 1; padding: 10px; background: none; border: none; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: 'Raleway', sans-serif; font-weight: 600; font-size: 14px; color: #9ca3af; cursor: pointer; transition: all 0.3s; }
+        .modal-tab.active { color: #3e6e06; border-bottom-color: #3e6e06; }
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 600; color: #5a5447; margin-bottom: 6px; font-size: 13px; }
+        .form-group input { width: 100%; padding: 11px 12px; border: 2px solid #d4dfc9; border-radius: 8px; font-family: 'Raleway', sans-serif; font-size: 14px; transition: border 0.3s; }
+        .form-group input:focus { outline: none; border-color: #3e6e06; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-buttons button { flex: 1; padding: 11px; border: none; border-radius: 8px; font-family: 'Raleway', sans-serif; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.3s; }
+        .btn-primary  { background: #3e6e06; color: white; }
+        .btn-primary:hover  { background: #2d5205; }
+        .btn-secondary { background: #e8e4d9; color: #5a5447; }
+        .btn-secondary:hover { background: #d4d0c5; }
+        .auth-toggle-link { text-align: center; margin-top: 14px; font-size: 13px; color: #5a5447; }
+        .auth-toggle-link a { color: #3e6e06; font-weight: 600; text-decoration: none; cursor: pointer; }
+        .auth-toggle-link a:hover { text-decoration: underline; }
+        .auth-feedback { padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; margin-bottom: 4px; line-height: 1.5; }
+        .auth-feedback.error   { background: #fdf0ee; border: 1.5px solid #e8b4a8; color: #8b3a2a; }
+        .auth-feedback.success { background: #edf5e8; border: 1.5px solid #a8d4a0; color: #2d6b20; }
+        .input-error { border-color: #c0392b !important; }
+        .hidden { display: none !important; }
+
+        @media (max-width: 900px) {
+            .two-col { grid-template-columns: 1fr; overflow-y: auto; }
+            html, body { overflow: auto; }
+            .app-container { height: auto; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+
+    <!-- -- HEADER ------------------------------------------------------- -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Weather Prediction and Crop Recommendation System</h1>
+            <p>Western Province, Sri Lanka</p>
+        </div>
+        <div class="header-controls">
+            <span id="userInfo" class="user-info" style="display:none;">Welcome, <span id="userName"></span>!</span>
+            <button id="signOutBtn" class="signout-button" style="display:none;">Sign Out</button>
+            <button id="authBtn" class="auth-button">Sign In</button>
+        </div>
+    </header>
+
+    <!-- -- PAGE BODY ---------------------------------------------------- -->
+    <div class="page-body">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="index.html">Soil Analysis</a>
+            <span class="breadcrumb-sep">></span>
+            <a href="weather.html">Weather Prediction</a>
+            <span class="breadcrumb-sep">></span>
+            <span>Crop Recommendation</span>
+        </div>
+
+        <!-- No-data fallback -->
+        <div id="noDataBox" class="no-data-box hidden">
+            ⚠️ Required data is missing. Please start from the
+            <a href="index.html">Soil Analysis</a> page and follow the steps.
+        </div>
+
+        <div class="section-title">🌱 Crop Recommendation</div>
+
+        <div class="two-col" id="mainContent" style="display:none;">
+
+            <!-- === LEFT: Inputs ====================================== -->
+            <div class="left-panel">
+
+                <!-- Environmental Data -->
+                <div class="card env-card">
+                    <div class="card-title">
+                        Environmental Data
+                        <span class="sys-tag">System Output</span>
+                    </div>
+                    <div class="env-groups-wrap">
+
+                        <div class="env-group">
+                            <div class="env-group-title">Weather Conditions</div>
+                            <div class="env-metrics-grid">
+                                <div class="env-metric">
+                                    <span class="val" id="displayTemp">-</span>
+                                    <span class="key">Temperature</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayRain">-</span>
+                                    <span class="key">Rainfall</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displaySun">-</span>
+                                    <span class="key">Sunshine</span>
+                                </div>
+                            </div>
+                            <div class="env-source">Source: Weather Prediction</div>
+                        </div>
+
+                        <div class="env-group soil">
+                            <div class="env-group-title">Soil Properties</div>
+                            <div class="env-metrics-grid">
+                                <div class="env-metric">
+                                    <span class="val" id="displayPH">-</span>
+                                    <span class="key">pH</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayOC">-</span>
+                                    <span class="key">Organic Carbon</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayCEC">-</span>
+                                    <span class="key">Cation Exchange Capacity</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayAWC">-</span>
+                                    <span class="key">Available Water Capacity</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayBD">-</span>
+                                    <span class="key">Bulk Density</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayTC">-</span>
+                                    <span class="key">Texture</span>
+                                </div>
+                            </div>
+                            <div class="env-source">Source: Soil Analysis</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Crop Selection -->
+                <div class="card" style="padding: 10px 14px;">
+                    <div class="card-title">Crop Selection</div>
+                    <select id="cropSelect" class="crop-select" onchange="onCropChange()">
+                        <option value="">- Select a crop (optional) -</option>
+                    </select>
+                </div>
+
+                <!-- Action Button -->
+                <button class="btn-action" id="mainBtn" onclick="handleMainAction()">
+                    Get Recommended Crop List
+                </button>
+
+            </div>
+            <!-- === END LEFT ========================================== -->
+
+            <!-- === RIGHT: Results ==================================== -->
+            <div class="right-panel">
+
+                <!-- Placeholder instructions -->
+                <div class="right-placeholder" id="rightPlaceholder">
+                    <div class="placeholder-icon">🌾</div>
+                    <div>
+                        <div class="placeholder-title">How to get your suitability report</div>
+                        <div class="placeholder-steps">
+                            <div class="placeholder-step">
+                                <span class="step-num">1</span>
+                                <span>Click <strong>Get Recommended Crop List</strong> to see the best crops for your current conditions.</span>
+                            </div>
+                            <div class="placeholder-step">
+                                <span class="step-num">2</span>
+                                <span>Pick a crop from the list, or choose one from the dropdown on the left.</span>
+                            </div>
+                            <div class="placeholder-step">
+                                <span class="step-num">3</span>
+                                <span>Click <strong>Get Suitability Results</strong> to run the full analysis.</span>
+                            </div>
+                            <div class="placeholder-step">
+                                <span class="step-num">4</span>
+                                <span>Download the report.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended crop list -->
+                <div class="result-card hidden" id="cropListCard">
+                    <div class="result-card-title">Recommended Crops for Your Region</div>
+                    <div class="crop-list" id="cropListContainer"></div>
+                </div>
+
+                <!-- Suitability report -->
+                <div class="result-card hidden" id="reportCard">
+                    <div class="report-top">
+                        <h3>Suitability Report</h3>
+                        <span class="crop-tag" id="reportCropName">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">Prediction</span>
+                        <span class="result-badge" id="resultBadge">-</span>
+                    </div>
+                    <div class="gauge-label">Suitability Probability</div>
+                    <div class="probability-gauge">
+                        <div class="gauge-fill" id="probabilityGauge"></div>
+                    </div>
+                    <div class="prob-value" id="probability">-</div>
+                    <div class="interpretation" id="interpretationText"></div>
+                    <div class="factors-title">
+                        Limiting Factors
+                    </div>
+                    <div id="factorsList"></div>
+                    <button class="btn-download" onclick="downloadReport()">Download Suitability Report</button>
+                </div>
+
+            </div>
+            <!-- === END RIGHT ======================================== -->
+
+        </div>
+    </div>
+</div>
+
+<!-- -- AUTH MODAL --------------------------------------------------- -->
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-mode="signin">Sign In</button>
+            <button class="modal-tab"        data-mode="signup">Sign Up</button>
+        </div>
+        <form id="authForm" novalidate>
+            <div class="form-group hidden" id="nameGroup">
+                <label for="authName">Full Name</label>
+                <input id="authName" type="text">
+            </div>
+            <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email">
+            </div>
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input id="authPassword" type="password">
+            </div>
+            <div class="form-group hidden" id="confirmGroup">
+                <label for="authConfirm">Confirm Password</label>
+                <input id="authConfirm" type="password">
+            </div>
+            <div id="authFeedback" class="auth-feedback hidden"></div>
+            <div class="modal-buttons">
+                <button type="submit"  class="btn-primary"   id="authSubmitBtn">Sign In</button>
+                <button type="button"  class="btn-secondary" id="authCloseBtn">Cancel</button>
+            </div>
+            <div class="auth-toggle-link hidden" id="toggleLink">
+                Still not registered? <a href="#" onclick="toggleAuthMode(event)">Sign up now</a>
+            </div>
+            <div class="auth-toggle-link hidden" id="signinLink">
+                Already have an account? <a href="#" onclick="toggleAuthModeToSignin(event)">Sign in</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// -- CONSTANTS ---------------------------------------------------------
+const CROP_API = "http://localhost:5003";
+
+const CROP_LIST = [
+    'Brinjal','Luffa','Okra','Cucumber','Snake Gourd','Bitter Gourd',
+    'Radish','Capsicum','Yard Long Bean','Banana','Pineapple','Ginger',
+    'Papaya','Passion Fruit','Sweet Potato','Rambutan','Mangosteen',
+    'Manioc','Kiriala','Yams','Turmeric'
+];
+
+// -- STATE --------------------------------------------------------------
+let soilData          = null;
+let weatherData       = null;
+let clusterExplanation = null;
+
+// -- INIT --------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    if (!sessionStorage.getItem('entered_system')) {
+        window.location.href = 'landing.html';
+        return;
+    }
+    initAuth();
+    restoreSession();
+
+    const rawSoil    = sessionStorage.getItem('soil_data');
+    const rawWeather = sessionStorage.getItem('weather_data');
+
+    if (!rawSoil || !rawWeather) {
+        document.getElementById('noDataBox').classList.remove('hidden');
+        return;
+    }
+
+    soilData          = JSON.parse(rawSoil);
+    weatherData       = JSON.parse(rawWeather);
+    try { clusterExplanation = JSON.parse(sessionStorage.getItem('cluster_explanation')); } catch(e) {}
+
+    // Populate the crop dropdown
+    CROP_LIST.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c; opt.textContent = c;
+        document.getElementById('cropSelect').appendChild(opt);
+    });
+
+    // Display environmental data
+    populateEnvDisplay();
+
+    document.getElementById('mainContent').style.display = 'grid';
+
+    // Auth
+
+    applyNumericFont(document.body);
+});
+
+// -- POPULATE DISPLAY CELLS ---------------------------------------------
+function populateEnvDisplay() {
+    // Weather
+    document.getElementById('displayTemp').textContent = weatherData.temperature_C.toFixed(1) + ' °C';
+    document.getElementById('displayRain').textContent = weatherData.rainfall_mm.toFixed(1)   + ' mm';
+    document.getElementById('displaySun').textContent  = weatherData.sunshine_h.toFixed(1)    + ' h';
+
+    // Soil
+    document.getElementById('displayPH').textContent  = soilData.ph            != null ? soilData.ph.toFixed(2)            : '-';
+    document.getElementById('displayOC').textContent  = soilData.organic_carbon != null ? soilData.organic_carbon.toFixed(2) + ' %' : '-';
+    document.getElementById('displayCEC').textContent = soilData.cec            != null ? soilData.cec.toFixed(2) + ' cmol/kg' : '-';
+    document.getElementById('displayAWC').textContent = soilData.awc            != null ? soilData.awc.toFixed(4)            : '-';
+    document.getElementById('displayBD').textContent  = soilData.bulk_density   != null ? soilData.bulk_density.toFixed(3) + ' g/cm³' : '-';
+    document.getElementById('displayTC').textContent  = soilData.texture_class  || '-';
+}
+
+// -- BUILD API PAYLOAD FROM SESSION DATA ----------------------------------
+function buildPayload(cropName) {
+    return {
+        crop:            cropName,
+        temperature:     weatherData.temperature_C,
+        rainfall:        weatherData.rainfall_mm,
+        sunshine_hours:  weatherData.sunshine_h,
+        ph:              soilData.ph,
+        organic_carbon:  soilData.organic_carbon,
+        cec:             soilData.cec,
+        awc:             soilData.awc,
+        bulk_density:    soilData.bulk_density,
+        texture_class:   soilData.texture_class   // backend maps this to texture_code
+    };
+}
+
+// -- DROPDOWN CHANGE ---------------------------------------------------
+function onCropChange() {
+    const val = document.getElementById('cropSelect').value;
+    document.getElementById('mainBtn').textContent = val
+        ? 'Get Suitability Results'
+        : 'Get Recommended Crop List';
+}
+
+// -- MAIN BUTTON -------------------------------------------------------
+async function handleMainAction() {
+    const val = document.getElementById('cropSelect').value;
+    if (!val) await showRecommendedList();
+    else      await fetchSuitabilityReport(val);
+}
+
+// -- RECOMMENDED CROP LIST (calls API for every crop in parallel) -------
+async function showRecommendedList() {
+    const btn = document.getElementById('mainBtn');
+    btn.disabled = true;
+    btn.textContent = 'Analysing all crops…';
+
+    // Show spinner
+    document.getElementById('rightPlaceholder').classList.add('hidden');
+    document.getElementById('reportCard').classList.add('hidden');
+    document.getElementById('cropListCard').classList.remove('hidden');
+    document.getElementById('cropListContainer').innerHTML =
+        `<div class="spinner-row"><div class="spinner"></div> Running predictions for all crops…</div>`;
+
+    try {
+        const results = await Promise.all(
+            CROP_LIST.map(async crop => {
+                try {
+                    const res  = await fetch(`${CROP_API}/predict`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body:    JSON.stringify(buildPayload(crop))
+                    });
+                    const data = await res.json();
+                    return { name: crop, prob: data.probability_suitable ?? 0, ok: res.ok };
+                } catch {
+                    return { name: crop, prob: 0, ok: false };
+                }
+            })
+        );
+
+        // Sort descending by probability (Top 10)
+        const ranked = results
+            .filter(r => r.ok)
+            .sort((a, b) => b.prob - a.prob)
+            .slice(0, 10);
+
+        const container = document.getElementById('cropListContainer');
+        container.innerHTML = '';
+
+        ranked.forEach((crop, i) => {
+            const pct   = (crop.prob * 100).toFixed(0);
+            const level = crop.prob >= 0.7 ? 'High' : crop.prob >= 0.5 ? 'Med' : 'Low';
+            const pill  = level === 'High' ? 'pill-high' : level === 'Med' ? 'pill-med' : 'pill-low';
+            const item  = document.createElement('div');
+            item.className = 'crop-list-item';
+            item.innerHTML = `
+                <span class="crop-rank">${i + 1}</span>
+                <span>${crop.name}</span>
+                <span class="suit-pill ${pill}">${pct}%</span>
+            `;
+            item.addEventListener('click', () => selectCropFromList(crop.name, item));
+            container.appendChild(item);
+        });
+
+        if (ranked.length === 0) {
+            container.innerHTML = '<p style="padding:16px;color:#999;font-size:13px;">No results returned. Ensure the crop API is running.</p>';
+        }
+
+        applyNumericFont(container);
+
+    } catch (e) {
+        document.getElementById('cropListContainer').innerHTML =
+            `<p style="padding:16px;color:#b91c1c;font-size:13px;">⚠️ Could not reach the crop API (localhost:5003). Please ensure it is running.</p>`;
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Get Recommended Crop List';
+    }
+}
+
+function selectCropFromList(cropName, el) {
+    document.querySelectorAll('.crop-list-item').forEach(i => i.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('cropSelect').value = cropName;
+    document.getElementById('mainBtn').textContent = 'Get Suitability Results';
+}
+
+// -- SUITABILITY REPORT ------------------------------------------------
+async function fetchSuitabilityReport(crop) {
+    const btn = document.getElementById('mainBtn');
+    btn.disabled = true;
+    btn.textContent = 'Loading…';
+
+    try {
+        const res  = await fetch(`${CROP_API}/predict`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(buildPayload(crop))
+        });
+
+        if (!res.ok) {
+            const err = await res.json();
+            alert('Error: ' + (err.error || 'Prediction failed'));
+            return;
+        }
+
+        const result = await res.json();
+        showReport(crop, result.probability_suitable, result.prediction);
+
+    } catch {
+        alert('Cannot connect to crop API on localhost:5003. Please ensure it is running.');
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Get Suitability Results';
+    }
+}
+
+// -- Crop optimal ranges - derived from training data (10th-90th percentile of Suitable rows)
+// Key: [tempMin,tempMax, rainMin,rainMax, sunMin,sunMax, phMin,phMax, ocMin,ocMax, cecMin,cecMax, awcMin,awcMax, bdMin,bdMax]
+const CROP_RANGES = {
+    'Banana':        [16.845,37.662,  688.073,2783.694,  3.583,9.165,  4.852,7.724,  0.921,3.476,  7.467,36.115,  0.013,0.043,  0.949,1.617],
+    'Bitter Gourd':  [18.91,35.707,   352.423,2335.13,   4.875,9.472,  4.916,7.408,  0.907,3.299,  9.807,33.606,  0.012,0.042,  1.011,1.587],
+    'Brinjal':       [17.992,34.915,  329.708,2363.786,  4.822,9.12,   5.085,7.805,  1.109,3.531,  11.922,36.093, 0.014,0.042,  0.998,1.638],
+    'Capsicum':      [17.236,33.532,  360.075,2520.776,  4.467,8.951,  4.91,7.426,   1.519,3.574,  10.302,37.463, 0.016,0.04,   0.944,1.582],
+    'Cucumber':      [18.496,37.285,  401.265,2176.611,  4.347,9.208,  5.062,7.525,  0.994,3.362,  9.569,35.7,    0.014,0.042,  1.057,1.659],
+    'Ginger':        [17.642,36.108,  523.601,2365.717,  3.816,9.281,  4.95,7.644,   0.811,3.267,  8.164,35.266,  0.013,0.041,  0.984,1.641],
+    'Kiriala':       [17.445,34.105,  676.376,1803.931,  3.135,8.811,  4.736,7.347,  0.99,3.628,   10.792,35.772, 0.013,0.041,  0.967,1.633],
+    'Luffa':         [16.791,35.964,  661.24,2536.206,   4.425,9.274,  4.946,7.482,  0.937,3.566,  10.392,34.557, 0.014,0.041,  0.953,1.599],
+    'Mangosteen':    [18.902,37.836,  370.751,2570.254,  3.764,8.992,  4.994,7.614,  0.84,3.579,   9.39,35.487,   0.015,0.039,  1.001,1.615],
+    'Manioc':        [17.884,37.079,  575.807,2633.191,  4.063,9.231,  4.945,7.643,  1.04,3.211,   7.228,35.8,    0.015,0.042,  1.023,1.57],
+    'Okra':          [19.068,37.863,  341.613,2473.147,  3.932,9.538,  4.911,7.542,  0.992,3.363,  12.195,30.541, 0.018,0.041,  0.981,1.577],
+    'Papaya':        [18.525,37.838,  665.649,2410.529,  4.23,9.416,   4.916,7.594,  0.936,3.48,   9.94,34.575,   0.014,0.04,   0.982,1.651],
+    'Passion Fruit': [19.354,38.462,  725.516,2841.267,  3.777,8.905,  4.836,7.557,  1.272,3.467,  8.629,36.822,  0.013,0.042,  0.945,1.553],
+    'Pineapple':     [19.401,37.072,  1070.874,2755.364, 3.868,9.629,  4.991,7.616,  1.024,3.691,  8.48,35.717,   0.014,0.041,  0.971,1.586],
+    'Radish':        [19.033,32.014,  327.34,2748.182,   4.443,8.194,  5.495,7.527,  0.882,3.287,  6.688,25.777,  0.015,0.037,  0.983,1.606],
+    'Rambutan':      [19.355,35.489,  468.098,2687.637,  4.407,9.516,  4.961,7.616,  1.041,3.776,  9.346,34.48,   0.013,0.038,  0.971,1.6],
+    'Snake Gourd':   [21.936,37.853,  301.089,2205.21,   4.043,9.211,  4.704,7.503,  1.041,3.447,  8.397,33.635,  0.015,0.038,  1.037,1.582],
+    'Sweet Potato':  [22.225,37.906,  388.725,2254.348,  4.151,9.453,  4.716,7.498,  0.675,3.136,  10.695,37.25,  0.012,0.034,  1.077,1.637],
+    'Turmeric':      [17.685,36.39,   712.615,2623.64,   3.384,8.599,  4.874,7.668,  0.774,3.41,   8.616,37.581,  0.014,0.04,   1.008,1.625],
+    'Yams':          [18.188,36.822,  519.712,2588.548,  4.28,9.469,   4.924,7.654,  0.871,3.498,  7.405,36.029,  0.015,0.041,  0.969,1.637],
+    'Yard Long Bean':[17.382,37.058,  445.336,2673.926,  5.519,9.378,  4.738,7.558,  0.893,3.292,  8.259,33.787,  0.013,0.04,   1.021,1.573],
+};
+
+// Absolute deviation thresholds per factor
+const FACTOR_THRESHOLDS = {
+    'Temperature':    [3,    3,    3,    3   ],
+    'Rainfall':       [150,  150,  300,  300 ],
+    'Sunshine Hours': [1,    1,    1,    1   ],
+    'Soil pH':        [0.5,  0.5,  0.5,  0.5 ],
+    'Organic Carbon': [0.3,  0.3,  0.5,  1.0 ], 
+    'CEC':            [3,    3,    5,    10  ],    
+    'AWC':            [0.005,0.005,null, null],    
+    'Bulk Density':   [0.1,  0.1,  0.1,  0.1 ],
+};
+
+function evalFactor(value, min, max, name, highIsGood) {
+    if (value >= min && value <= max) return 'good';
+    if (highIsGood && value > max)    return 'good';
+
+    const t = FACTOR_THRESHOLDS[name];
+    if (!t) {
+        // fallback
+        const buf = (max - min) * 0.20;
+        if (value >= min - buf && value <= max + buf) return 'warning';
+        return 'bad';
+    }
+
+    const [warnLo, badLo, warnHi, badHi] = t;
+
+    if (value < min) {
+        const diff = min - value;
+        if (diff <= warnLo) return 'warning';
+        return 'bad';
+    } else {
+        // value > max
+        if (highIsGood || warnHi === null) return 'good';
+        const diff = value - max;
+        if (diff <= warnHi) return 'warning';
+        return 'bad';
+    }
+}
+
+
+function buildFactorItem(name, value, unit, min, max,
+                         warnLow, badLow, warnHigh, badHigh,
+                         goodNote, highIsGood) {
+    const status    = evalFactor(value, min, max, name, highIsGood);
+    const icon      = status === 'good' ? '✔' : status === 'warning' ? '⚠' : '✘';
+    const cls       = 'factor-item fi-' + status;
+    const detailCls = status === 'warning' ? 'factor-detail advisory'
+                    : status === 'bad'     ? 'factor-detail critical'
+                    :                        'factor-detail';
+    let detail;
+    if (status === 'good') {
+        detail = goodNote || `Within the typical range for this crop.`;
+    } else if (value < min) {
+        detail = (status === 'warning' ? warnLow : badLow)
+                 || `Value (${value} ${unit}) is below the typical range (${min}-${max} ${unit}).`;
+    } else {
+        detail = (status === 'warning' ? warnHigh : badHigh)
+                 || `Value (${value} ${unit}) is above the typical range (${min}-${max} ${unit}).`;
+    }
+    return { cls, icon, name, detailCls, detail, status };
+}
+
+function renderFactors(items) {
+    const container = document.getElementById('factorsList');
+    const limiting  = items.filter(i => i.status !== 'good');
+
+    if (limiting.length === 0) {
+        container.innerHTML = `
+            <div class="factors-all-good">
+                ✅ All factors are within optimal range for this crop.
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = limiting.map(i => `
+        <div class="${i.cls}">
+            <div class="factor-icon">${i.icon}</div>
+            <div class="factor-body">
+                <div class="factor-name">${i.name}</div>
+                <div class="${i.detailCls}">${i.detail}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+function showReport(crop, prob, prediction) {
+    document.getElementById('reportCropName').textContent = crop;
+
+    const badge = document.getElementById('resultBadge');
+    badge.textContent = prediction;
+    badge.className = 'result-badge ' + (prediction === 'Suitable' ? 'badge-suitable' : 'badge-unsuitable');
+
+    document.getElementById('probabilityGauge').style.width = (prob * 100) + '%';
+    document.getElementById('probability').textContent = (prob * 100).toFixed(1) + '%';
+
+    const interp = document.getElementById('interpretationText');
+    if      (prob >= 0.75) interp.innerHTML = '✅ This crop is <strong>highly suitable</strong> for your region.';
+    else if (prob >= 0.5)  interp.innerHTML = '⚠️ This crop is <strong>moderately suitable</strong>. Consider adjusting conditions.';
+    else                   interp.innerHTML = '❌ This crop is <strong>not suitable</strong> for your region.';
+
+    // -- Limiting factors ---------------------------------------------
+    const r    = CROP_RANGES[crop];
+    const temp = weatherData.temperature_C;
+    const rain = weatherData.rainfall_mm;
+    const sun  = weatherData.sunshine_h;
+    const ph   = soilData.ph;
+    const oc   = soilData.organic_carbon;
+    const cec  = soilData.cec;
+    const awc  = soilData.awc;
+    const bd   = soilData.bulk_density;
+
+    const factors = [];
+
+    if (r) {
+        const [tMin,tMax, rMin,rMax, sMin,sMax, pMin,pMax, ocMin,ocMax,
+               ceMin,ceMax, awMin,awMax, bdMin,bdMax] = r;
+
+        factors.push(buildFactorItem('Temperature', temp, '°C', tMin, tMax,
+            `Temperature (${temp.toFixed(1)}°C) is slightly below the typical range for ${crop}. Yield may be somewhat reduced.`,
+            `Temperature (${temp.toFixed(1)}°C) is well below the typical range for ${crop}. Consider growing in a warmer season.`,
+            `Temperature (${temp.toFixed(1)}°C) is slightly above the typical range for ${crop}. Monitor for heat stress symptoms.`,
+            `Temperature (${temp.toFixed(1)}°C) significantly exceeds the typical range for ${crop}. Heat stress may substantially reduce yield.`,
+            `Temperature (${temp.toFixed(1)}°C) is within the typical range for ${crop}.`));
+
+        factors.push(buildFactorItem('Rainfall', rain, 'mm', rMin, rMax,
+            `Rainfall (${rain.toFixed(0)} mm) is slightly below the typical range. Occasional supplemental irrigation may help.`,
+            `Rainfall (${rain.toFixed(0)} mm) is well below requirements. Regular irrigation is essential for this crop.`,
+            `Rainfall (${rain.toFixed(0)} mm) is slightly above the typical range. Ensure adequate field drainage.`,
+            `Rainfall (${rain.toFixed(0)} mm) is very high. Risk of waterlogging and fungal disease - good drainage is critical.`,
+            `Rainfall (${rain.toFixed(0)} mm) is within the typical range.`));
+
+        factors.push(buildFactorItem('Sunshine Hours', sun, 'h/day', sMin, sMax,
+            `Sunshine hours (${sun.toFixed(1)} h) are slightly below the typical range. Choose a well-exposed, open plot.`,
+            `Sunshine hours (${sun.toFixed(1)} h) are well below requirements. Insufficient light may noticeably reduce yield and crop quality.`,
+            `Sunshine hours (${sun.toFixed(1)} h) are slightly above the typical range. Watch for leaf scorch in sensitive varieties.`,
+            `Sunshine hours (${sun.toFixed(1)} h) are very high. Combined heat and radiation stress may affect crop performance.`,
+            `Sunshine hours (${sun.toFixed(1)} h) are adequate for ${crop}.`));
+
+        factors.push(buildFactorItem('Soil pH', ph, '', pMin, pMax,
+            `Soil pH (${ph.toFixed(2)}) is slightly below the typical range for ${crop}. Liming may gradually improve conditions.`,
+            `Soil pH (${ph.toFixed(2)}) is well below the typical range. Increased acidity reduces nutrient availability. Liming is recommended.`,
+            `Soil pH (${ph.toFixed(2)}) is slightly above the typical range for ${crop}. Monitor micronutrient availability.`,
+            `Soil pH (${ph.toFixed(2)}) is well above the typical range. Acidifying amendments may help.`,
+            `Soil pH (${ph.toFixed(2)}) is within the typical range for ${crop}.`));
+
+        factors.push(buildFactorItem('Organic Carbon', oc, '%', ocMin, ocMax,
+            `Organic carbon (${oc.toFixed(2)}%) is slightly below the typical range. Adding compost will help improve soil fertility.`,
+            `Organic carbon (${oc.toFixed(2)}%) is well below the typical range. Soil fertility and structure may be poor. Regular organic matter additions are recommended.`,
+            `Organic carbon (${oc.toFixed(2)}%) is slightly above the typical range. Avoid further compost additions until next soil test. Monitor for nitrogen immobilisation.`,
+            `Organic carbon (${oc.toFixed(2)}%) is significantly above the typical range. Excessive organic matter can lock up nutrients, accumulate salts, and cause nitrogen immobilisation. Stop organic matter additions and allow natural decomposition.`,
+            `Organic carbon (${oc.toFixed(2)}%) is in good range.`));
+ 
+        factors.push(buildFactorItem('CEC', cec, 'cmol/kg', ceMin, ceMax,
+            `CEC (${cec.toFixed(1)} cmol/kg) is slightly below the typical range. Nutrients may be less effectively retained between applications.`,
+            `CEC (${cec.toFixed(1)} cmol/kg) is well below the typical range. Soil has limited ability to hold nutrients. Frequent, smaller fertiliser applications are more effective.`,
+            `CEC (${cec.toFixed(1)} cmol/kg) is slightly above the typical range. Soil is well-buffered - amendments will take effect slowly. Monitor micronutrient balance.`,
+            `CEC (${cec.toFixed(1)} cmol/kg) is significantly above the typical range. Very high CEC can cause strong nutrient lock-up and make pH correction difficult and expensive. Avoid further organic matter additions and test for micronutrient imbalances.`,
+            `CEC (${cec.toFixed(1)} cmol/kg) indicates adequate nutrient retention.`));
+
+        factors.push(buildFactorItem('AWC', awc, 'mm/mm', awMin, awMax,
+            `AWC (${awc.toFixed(3)} mm/mm) is slightly below the typical range. Monitor soil moisture closely during dry periods.`,
+            `AWC (${awc.toFixed(3)} mm/mm) is well below the typical range. Soil holds limited plant-available water. Increase irrigation frequency during dry spells.`,
+            null, null,
+            `AWC (${awc.toFixed(3)} mm/mm) is within a suitable range.`,
+            true));
+
+        factors.push(buildFactorItem('Bulk Density', bd, 'g/cm³', bdMin, bdMax,
+            `Bulk density (${bd.toFixed(2)} g/cm³) is slightly below the typical range, suggesting a loose soil structure.`,
+            `Bulk density (${bd.toFixed(2)} g/cm³) is very low, indicating excessively loose soil which may affect root anchorage.`,
+            `Bulk density (${bd.toFixed(2)} g/cm³) is slightly elevated. Some compaction may restrict deeper root penetration.`,
+            `Bulk density (${bd.toFixed(2)} g/cm³) indicates compacted soil. Root growth may be significantly restricted. Deep tillage is recommended.`,
+            `Bulk density (${bd.toFixed(2)} g/cm³) indicates good soil structure.`));
+    }
+
+    // Texture: informational only (no optimal range - model uses texture_code internally)
+    factors.push({
+        cls: 'factor-item fi-good', icon: 'ℹ', status: 'good',
+        name: 'Soil Texture',
+        detailCls: 'factor-detail',
+        detail: `Texture class: ${soilData.texture_class || '-'}. Used by the model for water and nutrient behaviour.`
+    });
+
+    renderFactors(factors);
+
+    document.getElementById('rightPlaceholder').classList.add('hidden');
+    document.getElementById('cropListCard').classList.add('hidden');
+    document.getElementById('reportCard').classList.remove('hidden');
+
+    applyNumericFont(document.getElementById('reportCard'));
+}
+
+// -- DOWNLOAD REPORT (opens report.html as PDF page) ------
+async function downloadReport() {
+    const crop       = document.getElementById('reportCropName').textContent;
+    const prob       = parseFloat(document.getElementById('probability').textContent) / 100;
+    const prediction = document.getElementById('resultBadge').textContent;
+    const interp     = document.getElementById('interpretationText').innerText;
+
+    const soil    = JSON.parse(sessionStorage.getItem('soil_data')    || 'null');
+    const weather = JSON.parse(sessionStorage.getItem('weather_data') || 'null');
+
+    // Fetch zone explanation from soil API using stored location
+    let zoneExpl = JSON.parse(sessionStorage.getItem('cluster_explanation') || 'null');
+    if (!zoneExpl && soil) {
+        try {
+            const loc   = JSON.parse(sessionStorage.getItem('location') || 'null');
+            const model = soil.model || 'kmeans';
+            if (loc) {
+                const resp = await fetch(
+                    `http://localhost:5001/soil?lat=${loc.lat}&lon=${loc.lon}&model=${model}`
+                );
+                const data = await resp.json();
+                if (data.cluster_explanation) {
+                    zoneExpl = data.cluster_explanation;
+                    sessionStorage.setItem('cluster_explanation', JSON.stringify(zoneExpl));
+                }
+            }
+        } catch(e) {
+            console.warn('Could not fetch cluster explanation:', e);
+        }
+    }
+
+    const payload = {
+        state:    { crop, prob, prediction, interp },
+        soil,
+        weather,
+        zoneExpl
+    };
+
+    const encoded = encodeURIComponent(JSON.stringify(payload));
+    window.open('report.html?data=' + encoded, '_blank');
+}
+
+// -- NUMERIC FONT HELPER -----------------------------------------------
+function applyNumericFont(root) {
+    root = root || document.body;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            const tag = node.parentNode && node.parentNode.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+            if (node.parentNode.classList && node.parentNode.classList.contains('n')) return NodeFilter.FILTER_REJECT;
+            return /\d/.test(node.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+        const parts = node.textContent.split(/([\d][\d.,]*)/);
+        if (parts.length <= 1) return;
+        const frag = document.createDocumentFragment();
+        parts.forEach(part => {
+            if (!part) return;
+            if (/^\d/.test(part)) {
+                const s = document.createElement('span');
+                s.className = 'n';
+                s.textContent = part;
+                frag.appendChild(s);
+            } else {
+                frag.appendChild(document.createTextNode(part));
+            }
+        });
+        node.parentNode.replaceChild(frag, node);
+    });
+}
+
+// -- AUTH --------------------------------------------------------------
+</script>
+<script src="auth.js"></script>
+</body>
+</html>

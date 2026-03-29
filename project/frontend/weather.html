@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Prediction - Western Province, Sri Lanka</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #f5ede4 0%, #faf8f3 50%, #f0f4e8 100%);
+            color: #5a5447;
+            overflow-x: hidden;
+        }
+
+        /* -- APP SHELL ----------------------------------------------- */
+        .app-container { display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* -- HEADER -------------------------------------------------- */
+        .header {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header-content h1 { font-size: 32px; font-weight: 700; margin-bottom: 4px; }
+        .header-content p  { font-size: 14px; color: #e8f0e8; font-weight: 500; }
+        .header-controls   { display: flex; gap: 16px; align-items: center; }
+
+        .auth-button {
+            padding: 10px 20px;
+            background: #d2b452;
+            color: #1a3205;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Raleway';
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .auth-button:hover { background: #a57f18; }
+
+        .signout-button {
+            padding: 10px 20px;
+            background: transparent;
+            color: #e8f0e8;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 8px;
+            font-family: 'Raleway';
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .signout-button:hover { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.7); }
+        .user-info { color: #e8f0e8; font-weight: 600; }
+
+        /* -- PAGE BODY ----------------------------------------------- */
+        .page-body {
+            flex: 1;
+            padding: 28px 32px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* -- BREADCRUMB ---------------------------------------------- */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #8b7b6b;
+        }
+        .breadcrumb a {
+            color: #3e6e06;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .breadcrumb a:hover { color: #2d5205; text-decoration: underline; }
+        .breadcrumb-sep { color: #c4b89a; }
+
+        /* -- CARDS ---------------------------------------------------- */
+        .card {
+            background: #fefdfb;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            border: 2px solid #e8e4d9;
+        }
+        .card-header { margin-bottom: 20px; border-bottom: 2px solid #f0ede7; padding-bottom: 16px; }
+        .card-header h2 { font-size: 20px; font-weight: 700; color: #5a5447; }
+
+        /* -- LOCATION INFO BANNER ------------------------------------ */
+        .location-banner {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, #eef4e8, #f5f0e8);
+            border: 2px solid #d4dfc9;
+            border-radius: 16px;
+            padding: 18px 22px;
+        }
+        .location-icon { font-size: 28px; }
+        .location-text-group { flex: 1; }
+        .location-district {
+            font-size: 17px;
+            font-weight: 700;
+            color: #3e6e06;
+            margin-bottom: 3px;
+        }
+        .location-coords {
+            font-size: 13px;
+            color: #8b7b6b;
+            font-weight: 600;
+        }
+        .location-change-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 2px solid #d4dfc9;
+            border-radius: 8px;
+            font-family: 'Raleway';
+            font-weight: 600;
+            font-size: 13px;
+            color: #5a5447;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        .location-change-btn:hover { border-color: #3e6e06; color: #3e6e06; }
+
+        /* -- FORM GRID ----------------------------------------------- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .form-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #8b7b6b;
+            margin-bottom: 8px;
+        }
+        .form-field input,
+        .form-field select {
+            width: 100%;
+            border-radius: 12px;
+            border: 2px solid #d4dfc9;
+            padding: 12px 14px;
+            background: #fafaf8;
+            font-family: 'Raleway';
+            font-size: 14px;
+            font-weight: 600;
+            color: #5a5447;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            border-color: #3e6e06;
+            box-shadow: 0 0 0 4px rgba(62,110,6,0.10);
+            background: white;
+        }
+
+        .auto-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #b7932a;
+            text-transform: none;
+            letter-spacing: 0;
+            margin-left: 4px;
+        }
+
+        #season {
+            color: #3e6e06;
+            font-weight: 700;
+        }
+
+        /* -- PREDICT BUTTON ------------------------------------------ */
+        .btn-predict {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Raleway';
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(62,110,6,0.25);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin-top: 4px;
+        }
+        .btn-predict:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(62,110,6,0.35); }
+        .btn-predict:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+        /* -- RESULTS GRID -------------------------------------------- */
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .result-card {
+            position: relative;
+            border-radius: 16px;
+            background: #eef2ea;
+            border: 2px solid rgba(62,110,6,0.12);
+            padding: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.07);
+        }
+        .result-card::before {
+            content: "";
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 5px;
+            background: linear-gradient(180deg, #2f5b08 0%, #b7932a 100%);
+        }
+        .result-label {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: rgba(90,84,71,0.65);
+            margin-bottom: 10px;
+        }
+        .result-value {
+            font-family: 'Segoe UI', sans-serif;
+            font-size: 34px;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1;
+        }
+
+        /* -- ERROR --------------------------------------------------- */
+        .error-box {
+            background: #fde8e8;
+            border: 2px solid rgba(239,68,68,0.25);
+            color: #b91c1c;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+        }
+
+        /* -- MISSING LOCATION WARNING -------------------------------- */
+        .no-location-box {
+            background: #fffbe8;
+            border: 2px solid #e0cc7a;
+            color: #7a6010;
+            padding: 18px 22px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .no-location-box a { color: #3e6e06; font-weight: 700; text-decoration: none; }
+        .no-location-box a:hover { text-decoration: underline; }
+
+        /* -- CROP BTN ------------------------------------------------ */
+        .btn-crop {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #d2b452 0%, #b7932a 100%);
+            color: #1a3205;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Raleway';
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(183,147,42,0.30);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: none;
+        }
+        .btn-crop:hover { transform: translateY(-2px); box-shadow: 0 15px 35px rgba(183,147,42,0.40); }
+
+        /* -- MODAL --------------------------------------------------- */
+        .modal {
+            display: none; position: fixed; z-index: 1000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            align-items: center; justify-content: center;
+        }
+        .modal.show { display: flex; }
+        .modal-content {
+            background: white; padding: 40px; border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%; max-width: 400px;
+        }
+        .modal-tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e8e4d9; }
+        .modal-tab {
+            flex: 1; padding: 12px; background: none; border: none;
+            border-bottom: 3px solid transparent; font-family: 'Raleway';
+            font-weight: 600; font-size: 14px; color: #9ca3af; cursor: pointer; transition: all 0.3s;
+        }
+        .modal-tab.active { color: #3e6e06; border-bottom-color: #3e6e06; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-weight: 600; color: #5a5447; margin-bottom: 8px; font-size: 14px; }
+        .form-group input {
+            width: 100%; padding: 12px; border: 2px solid #d4dfc9; border-radius: 8px;
+            font-family: 'Raleway'; font-size: 14px; transition: border 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: #3e6e06; }
+        .modal-buttons { display: flex; gap: 12px; margin-top: 24px; }
+        .modal-buttons button {
+            flex: 1; padding: 12px; border: none; border-radius: 8px;
+            font-family: 'Raleway'; font-weight: 600; cursor: pointer; transition: all 0.3s;
+        }
+        .btn-primary   { background: #3e6e06; color: white; }
+        .btn-primary:hover   { background: #2d5205; }
+        .btn-secondary { background: #e8e4d9; color: #5a5447; }
+        .btn-secondary:hover { background: #d4d0c5; }
+        .auth-toggle-link { text-align: center; margin-top: 16px; font-size: 14px; color: #5a5447; }
+        .auth-toggle-link a { color: #3e6e06; font-weight: 600; text-decoration: none; cursor: pointer; }
+        .auth-toggle-link a:hover { text-decoration: underline; }
+        .hidden { display: none !important; }
+
+        .auth-feedback {
+            padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600;
+            margin-bottom: 4px; line-height: 1.5;
+        }
+        .auth-feedback.error   { background: #fdf0ee; border: 1.5px solid #e8b4a8; color: #8b3a2a; }
+        .auth-feedback.success { background: #edf5e8; border: 1.5px solid #a8d4a0; color: #2d6b20; }
+        .input-error { border-color: #c0392b !important; }
+
+        @media (max-width: 640px) {
+            .page-body { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .results-grid { grid-template-columns: 1fr; }
+            .header-content h1 { font-size: 22px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- -- HEADER ----------------------------------------------------- -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Weather Prediction and Crop Recommendation System</h1>
+            <p>Western Province, Sri Lanka</p>
+        </div>
+        <div class="header-controls">
+            <span id="userInfo" class="user-info" style="display:none;">Welcome, <span id="userName"></span>!</span>
+            <button id="signOutBtn" class="signout-button" style="display:none;">Sign Out</button>
+            <button id="authBtn"    class="auth-button">Sign In</button>
+        </div>
+    </header>
+
+    <!-- -- PAGE BODY -------------------------------------------------- -->
+    <div class="page-body">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="index.html">Soil Analysis</a>
+            <span class="breadcrumb-sep">></span>
+            <span>Weather Prediction</span>
+            <span class="breadcrumb-sep">></span>
+            <span style="color:#c4b89a;">Crop Recommendation</span>
+        </div>
+
+        <!-- No-location fallback -->
+        <div id="noLocationBox" class="no-location-box" style="display:none;">
+            ⚠️ No location selected. Please <a href="index.html">go back to the map</a> and select a location point first.
+        </div>
+
+        <!-- Location Banner -->
+        <div id="locationBanner" class="location-banner" style="display:none;">
+            <span class="location-icon">📍</span>
+            <div class="location-text-group">
+                <div class="location-district" id="districtName">-</div>
+                <div class="location-coords"   id="coordsText">-</div>
+            </div>
+            <button class="location-change-btn" onclick="window.location.href='index.html'">Change Location</button>
+        </div>
+
+        <!-- Input Card -->
+        <div class="card" id="inputCard" style="display:none;">
+            <div class="card-header"><h2>Weather Data</h2></div>
+
+            <div id="errorBox" class="error-box"></div>
+
+            <div class="form-field">
+                <label for="season">Season</label>
+                <select id="season">
+                    <option value="North-east monsoon">North-east Monsoon (December - February)</option>
+                    <option value="Intermonsoon after North-east monsoon">Intermonsoon after North-east Monsoon (March - April)</option>
+                    <option value="South-west monsoon">South-west Monsoon (May - September)</option>
+                    <option value="Intermonsoon after South-west monsoon">Intermonsoon after South-west Monsoon (October - November)</option>
+                </select>
+            </div>
+
+            <button id="predictBtn" class="btn-predict" type="button">Predict Weather</button>
+        </div>
+
+        <!-- Results Card -->
+        <div class="card" id="resultsCard" style="display:none;">
+            <div class="card-header"><h2>Prediction Results</h2></div>
+            <div class="results-grid">
+                <div class="result-card">
+                    <div class="result-label">Temperature</div>
+                    <div class="result-value" id="tempOut">-</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Rainfall</div>
+                    <div class="result-value" id="rainOut">-</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">Sunshine</div>
+                    <div class="result-value" id="sunOut">-</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proceed to Crop Recommendation -->
+        <button id="cropBtn" class="btn-crop" type="button" onclick="proceedToCrop()">
+            Get Crop Recommendation
+        </button>
+
+    </div>
+</div>
+
+<!-- -- AUTH MODAL --------------------------------------------------- -->
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-mode="signin">Sign In</button>
+            <button class="modal-tab"        data-mode="signup">Sign Up</button>
+        </div>
+        <form id="authForm" novalidate>
+            <div class="form-group hidden" id="nameGroup">
+                <label for="authName">Full Name</label>
+                <input id="authName" type="text">
+            </div>
+            <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email">
+            </div>
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input id="authPassword" type="password">
+            </div>
+            <div class="form-group hidden" id="confirmGroup">
+                <label for="authConfirm">Confirm Password</label>
+                <input id="authConfirm" type="password">
+            </div>
+            <div id="authFeedback" class="auth-feedback hidden"></div>
+            <div class="modal-buttons">
+                <button type="submit"  class="btn-primary"   id="authSubmitBtn">Sign In</button>
+                <button type="button"  class="btn-secondary" id="authCloseBtn">Cancel</button>
+            </div>
+            <div class="auth-toggle-link hidden" id="toggleLink">
+                Still not registered? <a href="#" onclick="toggleAuthMode(event)">Sign up now</a>
+            </div>
+            <div class="auth-toggle-link hidden" id="signinLink">
+                Already have an account? <a href="#" onclick="toggleAuthModeToSignin(event)">Sign in</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// -- CONSTANTS -------------------------------------------------------
+const WEATHER_API = "http://localhost:5002";
+
+// -- DISTRICT DETECTION ----------------------------------------------
+let _districtGeo = null;
+
+async function loadDistrictGeo() {
+    if (_districtGeo) return _districtGeo;
+    try {
+        const res  = await fetch('western_province_districts.json');
+        _districtGeo = await res.json();
+    } catch(e) {
+        console.warn('Could not load district GeoJSON, falling back to lat ranges:', e);
+        _districtGeo = {};
+    }
+    return _districtGeo;
+}
+
+// Ray-casting point-in-polygon for a single ring of [lon, lat] coords
+function pointInRing(lon, lat, ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+        const xi = ring[i][0], yi = ring[i][1];
+        const xj = ring[j][0], yj = ring[j][1];
+        const intersect = ((yi > lat) !== (yj > lat)) &&
+                          (lon < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+        if (intersect) inside = !inside;
+    }
+    return inside;
+}
+
+// Check if point is inside a GeoJSON geometry (Polygon or MultiPolygon)
+function pointInGeometry(lon, lat, geometry) {
+    if (geometry.type === 'Polygon') {
+        return pointInRing(lon, lat, geometry.coordinates[0]);
+    }
+    if (geometry.type === 'MultiPolygon') {
+        return geometry.coordinates.some(poly => pointInRing(lon, lat, poly[0]));
+    }
+    return false;
+}
+
+// Fallback lat-range lookup
+const DISTRICT_FALLBACK = [
+    { id: "2", name: "Gampaha District",  minLat: 7.00, maxLat: 7.30 },
+    { id: "1", name: "Colombo District",  minLat: 6.72, maxLat: 7.00 },
+    { id: "3", name: "Kalutara District", minLat: 6.40, maxLat: 6.72 },
+];
+function getDistrictFallback(lat) {
+    for (const d of DISTRICT_FALLBACK) {
+        if (lat >= d.minLat && lat < d.maxLat) return d;
+    }
+    return lat >= 7.00 ? DISTRICT_FALLBACK[0] : DISTRICT_FALLBACK[2];
+}
+
+// Main: returns {id, name} using exact polygon if GeoJSON loaded
+async function getDistrict(lat, lon) {
+    const geo = await loadDistrictGeo();
+    const NAMES = {
+        'Colombo':  { id: '1', name: 'Colombo District'  },
+        'Gampaha':  { id: '2', name: 'Gampaha District'  },
+        'Kalutara': { id: '3', name: 'Kalutara District' },
+    };
+    for (const [distName, meta] of Object.entries(NAMES)) {
+        if (geo[distName] && pointInGeometry(lon, lat, geo[distName].geometry)) {
+            return meta;
+        }
+    }
+    // Point not inside any polygon - fall back to lat range
+    return getDistrictFallback(lat);
+}
+
+// -- INIT -------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', async () => {
+    if (!sessionStorage.getItem('entered_system')) {
+        window.location.href = 'landing.html';
+        return;
+    }
+    initAuth();
+    restoreSession();
+
+    const raw = sessionStorage.getItem('location');
+    if (!raw) {
+        document.getElementById('noLocationBox').style.display = 'block';
+        return;
+    }
+
+    const loc      = JSON.parse(raw);
+    const district = await getDistrict(loc.lat, loc.lon);
+
+    document.getElementById('locationBanner').style.display = 'flex';
+    document.getElementById('inputCard').style.display      = 'block';
+    document.getElementById('districtName').textContent     = district.name;
+    document.getElementById('coordsText').textContent =
+        `Lat ${loc.lat.toFixed(5)},  Lon ${loc.lon.toFixed(5)}`;
+    applyNumericFont(document.getElementById('coordsText'));
+
+    // Auto-select season based on current month
+    document.getElementById('season').value = getCurrentSeason();
+
+    document.getElementById('predictBtn').addEventListener('click', () => runPrediction(loc, district));
+});
+
+// -- SEASON-DATE TWO-WAY SYNC --------------------------------------
+
+// Returns the season matching the current calendar month
+function getCurrentSeason() {
+    const month = new Date().getMonth() + 1;
+    if (month === 12 || month <= 2) return 'North-east monsoon';
+    if (month <= 4)                 return 'Intermonsoon after North-east monsoon';
+    if (month <= 9)                 return 'South-west monsoon';
+    return                                 'Intermonsoon after South-west monsoon';
+}
+
+// -- PREDICTION -------------------------------------------------------
+async function runPrediction(loc, district) {
+    const btn = document.getElementById('predictBtn');
+    const errorBox = document.getElementById('errorBox');
+    const season = document.getElementById('season').value;
+    const year   = new Date().getFullYear();   // current year, sent automatically
+
+    errorBox.style.display = 'none';
+    document.getElementById('cropBtn').style.display = 'none';
+    document.getElementById('resultsCard').style.display = 'none';
+
+    btn.disabled = true;
+    btn.textContent = 'Predicting…';
+
+    try {
+        const res = await fetch(`${WEATHER_API}/predict`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                season,
+                year,
+                location_id: district.id
+            })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+            errorBox.textContent = data?.error || 'Prediction failed. Check that the weather API is running.';
+            errorBox.style.display = 'block';
+            return;
+        }
+
+        // Display results
+        document.getElementById('tempOut').textContent = `${data.temperature_C.toFixed(2)} °C`;
+        document.getElementById('rainOut').textContent = `${data.rainfall_mm.toFixed(2)} mm`;
+        document.getElementById('sunOut').textContent  = `${data.sunshine_h.toFixed(1)} h`;
+        document.getElementById('resultsCard').style.display = 'block';
+        applyNumericFont(document.getElementById('resultsCard'));
+
+        // Store weather results for crop page
+        sessionStorage.setItem('weather_data', JSON.stringify({
+            temperature_C: data.temperature_C,
+            rainfall_mm:   data.rainfall_mm,
+            sunshine_h:    data.sunshine_h,
+            season,
+            year,
+            district:      district.name,
+            location_id:   district.id
+        }));
+
+        document.getElementById('cropBtn').style.display = 'block';
+
+    } catch (e) {
+        errorBox.textContent = 'Cannot connect to the weather API. Make sure it is running on localhost:5002.';
+        errorBox.style.display = 'block';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Predict Weather';
+    }
+}
+
+// -- NAVIGATE TO CROP PAGE --------------------------------------------
+function proceedToCrop() {
+    window.location.href = 'crop.html';
+}
+
+
+// -- NUMERIC FONT --------------------
+function applyNumericFont(root) {
+    root = root || document.body;
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            const tag = node.parentNode && node.parentNode.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+            if (node.parentNode.classList && node.parentNode.classList.contains('n')) return NodeFilter.FILTER_REJECT;
+            return /\d/.test(node.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+        const parts = node.textContent.split(/([\d][\d.,]*)/);
+        if (parts.length <= 1) return;
+        const frag = document.createDocumentFragment();
+        parts.forEach(part => {
+            if (!part) return;
+            if (/^\d/.test(part)) {
+                const s = document.createElement('span');
+                s.style.fontFamily = "'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif";
+                s.textContent = part;
+                frag.appendChild(s);
+            } else {
+                frag.appendChild(document.createTextNode(part));
+            }
+        });
+        node.parentNode.replaceChild(frag, node);
+    });
+}
+</script>
+<script src="auth.js"></script>
+</body>
+</html>
