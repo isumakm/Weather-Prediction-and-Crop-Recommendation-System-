@@ -1,0 +1,119 @@
+{
+  "K-Means": {
+    "global": {
+      "taw": 0.0756,
+      "organic_carbon": 0.1126,
+      "cec": 0.1594,
+      "ph": 0.0625,
+      "sand_pct": 0.0245
+    },
+    "clusters": {
+      "0": {
+        "taw": 0.1523,
+        "organic_carbon": 0.1587,
+        "cec": 0.1513,
+        "ph": 0.0753,
+        "sand_pct": 0.0307
+      },
+      "1": {
+        "taw": 0.0613,
+        "organic_carbon": 0.1051,
+        "cec": 0.1876,
+        "ph": 0.0363,
+        "sand_pct": 0.018
+      },
+      "2": {
+        "taw": 0.12,
+        "organic_carbon": 0.0762,
+        "cec": 0.1602,
+        "ph": 0.1211,
+        "sand_pct": 0.0553
+      },
+      "3": {
+        "taw": 0.0499,
+        "organic_carbon": 0.1228,
+        "cec": 0.1316,
+        "ph": 0.0617,
+        "sand_pct": 0.0166
+      }
+    }
+  },
+  "Agglomerative": {
+    "global": {
+      "taw": 0.0542,
+      "organic_carbon": 0.1164,
+      "cec": 0.1615,
+      "ph": 0.0415,
+      "sand_pct": 0.0295
+    },
+    "clusters": {
+      "0": {
+        "taw": 0.033,
+        "organic_carbon": 0.1186,
+        "cec": 0.1365,
+        "ph": 0.0342,
+        "sand_pct": 0.0221
+      },
+      "1": {
+        "taw": 0.1289,
+        "organic_carbon": 0.1869,
+        "cec": 0.1534,
+        "ph": 0.055,
+        "sand_pct": 0.031
+      },
+      "2": {
+        "taw": 0.046,
+        "organic_carbon": 0.1017,
+        "cec": 0.1897,
+        "ph": 0.0267,
+        "sand_pct": 0.0194
+      },
+      "3": {
+        "taw": 0.0946,
+        "organic_carbon": 0.0972,
+        "cec": 0.1639,
+        "ph": 0.1066,
+        "sand_pct": 0.09
+      }
+    }
+  },
+  "GMM": {
+    "global": {
+      "taw": 0.0682,
+      "organic_carbon": 0.1311,
+      "cec": 0.1652,
+      "ph": 0.0413,
+      "sand_pct": 0.0231
+    },
+    "clusters": {
+      "0": {
+        "taw": 0.1592,
+        "organic_carbon": 0.1603,
+        "cec": 0.151,
+        "ph": 0.0564,
+        "sand_pct": 0.0334
+      },
+      "1": {
+        "taw": 0.0542,
+        "organic_carbon": 0.1068,
+        "cec": 0.1952,
+        "ph": 0.0269,
+        "sand_pct": 0.0163
+      },
+      "2": {
+        "taw": 0.1021,
+        "organic_carbon": 0.1149,
+        "cec": 0.1714,
+        "ph": 0.0753,
+        "sand_pct": 0.0467
+      },
+      "3": {
+        "taw": 0.043,
+        "organic_carbon": 0.155,
+        "cec": 0.1354,
+        "ph": 0.0381,
+        "sand_pct": 0.0175
+      }
+    }
+  }
+}

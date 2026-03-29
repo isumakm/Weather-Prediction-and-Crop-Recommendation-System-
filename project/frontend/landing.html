@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Prediction and Crop Recommendation System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%;font-family:'Raleway',sans-serif;background:linear-gradient(135deg,#f5ede4 0%,#faf8f3 50%,#f0f4e8 100%);color:#5a5447;overflow-x:hidden}
+        .header{background:linear-gradient(135deg,#3e6e06 0%,#665521 100%);color:white;padding:20px 32px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 20px rgba(0,0,0,.15)}
+        .header h1{font-size:20px;font-weight:700}
+        .header p{font-size:12px;color:#d4e8c0;font-weight:500;margin-top:2px}
+        .header-right{display:flex;align-items:center;gap:12px}
+        .user-info{color:#e8f0e8;font-weight:600;font-size:14px}
+        .btn-hdr{padding:9px 20px;border:none;border-radius:8px;font-family:'Raleway';font-weight:700;font-size:13px;cursor:pointer;transition:all .2s}
+        .btn-signin{background:#d2b452;color:#1a3205}.btn-signin:hover{background:#b79630}
+        .btn-signout{background:transparent;color:#e8f0e8;border:2px solid rgba(255,255,255,.4)}.btn-signout:hover{background:rgba(255,255,255,.15)}
+        /* toast */
+        .toast{display:none;position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#3e6e06;color:white;padding:14px 28px;border-radius:10px;font-size:15px;font-weight:600;box-shadow:0 8px 24px rgba(62,110,6,.35);z-index:2000;white-space:nowrap}
+        .toast.show{display:block;animation:fs .4s ease}
+        @keyframes fs{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        /* hero */
+        .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:56px 24px 40px}
+        .badge{display:inline-block;background:#eef4e8;border:1.5px solid #b5d490;color:#3e6e06;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:5px 16px;border-radius:20px;margin-bottom:20px}
+        .hero h2{font-size:38px;font-weight:800;color:#3e6e06;line-height:1.2;max-width:680px;margin-bottom:16px}
+        .hero>p{font-size:16px;color:#7a6e5e;max-width:560px;line-height:1.7;font-weight:500;margin-bottom:36px}
+        .cta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:52px}
+        .btn-enter{padding:16px 36px;background:linear-gradient(135deg,#3e6e06,#665521);color:white;border:none;border-radius:12px;font-family:'Raleway';font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 10px 28px rgba(62,110,6,.28);transition:transform .2s,box-shadow .2s}
+        .btn-enter:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(62,110,6,.38)}
+        .btn-guest{padding:16px 36px;background:transparent;color:#5a5447;border:2px solid #c8c0b0;border-radius:12px;font-family:'Raleway';font-size:16px;font-weight:700;cursor:pointer;transition:border-color .2s,color .2s}
+        .btn-guest:hover{border-color:#3e6e06;color:#3e6e06}
+        /* steps */
+        .sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#b7932a;text-align:center;margin-bottom:12px}
+        .sec-title{font-size:24px;font-weight:800;color:#3e6e06;text-align:center;margin-bottom:36px}
+        .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:960px;margin:0 auto 64px;padding:0 24px}
+        .step{background:white;border-radius:16px;padding:24px 20px;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.06);border:1.5px solid #e8e4d9;position:relative}
+        .snum{width:36px;height:36px;background:linear-gradient(135deg,#3e6e06,#665521);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;margin:0 auto 14px}
+        .sico{font-size:28px;margin-bottom:10px}
+        .step h3{font-size:14px;font-weight:700;color:#3e6e06;margin-bottom:8px}
+        .step p{font-size:12px;color:#8b7b6b;line-height:1.6;font-weight:500}
+        .sarr{position:absolute;right:-12px;top:50%;transform:translateY(-50%);font-size:20px;color:#d2b452;z-index:1}
+        /* about */
+        .about{background:white;border-top:1.5px solid #e8e4d9;padding:48px 24px;text-align:center}
+        .agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:800px;margin:32px auto 0}
+        .acard{padding:20px}
+        .aico{font-size:32px;margin-bottom:12px}
+        .acard h4{font-size:14px;font-weight:700;color:#3e6e06;margin-bottom:6px}
+        .acard p{font-size:12px;color:#8b7b6b;line-height:1.6}
+        /* footer */
+        .footer{background:linear-gradient(135deg,#3e6e06,#665521);color:#d4e8c0;text-align:center;padding:20px;font-size:12px;font-weight:500}
+        /* modal */
+        .modal{display:none;position:fixed;z-index:1000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.5);align-items:center;justify-content:center}
+        .modal.show{display:flex}
+        .modal-content{background:white;padding:40px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);width:90%;max-width:420px}
+        .modal-tabs{display:flex;margin-bottom:24px;border-bottom:2px solid #e8e4d9}
+        .modal-tab{flex:1;padding:12px;background:none;border:none;border-bottom:3px solid transparent;margin-bottom:-2px;font-family:'Raleway';font-weight:600;font-size:15px;color:#9ca3af;cursor:pointer;transition:all .2s}
+        .modal-tab.active{color:#3e6e06;border-bottom-color:#3e6e06}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-weight:600;color:#5a5447;margin-bottom:8px;font-size:14px}
+        .form-group input{width:100%;padding:12px;border:2px solid #d4dfc9;border-radius:8px;font-family:'Raleway';font-size:14px;transition:border .2s}
+        .form-group input:focus{outline:none;border-color:#3e6e06}
+        .modal-buttons{display:flex;gap:12px;margin-top:24px}
+        .modal-buttons button{flex:1;padding:12px;border:none;border-radius:8px;font-family:'Raleway';font-weight:700;font-size:14px;cursor:pointer;transition:all .2s}
+        .btn-primary{background:#3e6e06;color:white}.btn-primary:hover{background:#2d5205}
+        .btn-secondary{background:#e8e4d9;color:#5a5447}.btn-secondary:hover{background:#d4d0c5}
+        .auth-toggle-link{text-align:center;margin-top:14px;font-size:13px;color:#5a5447}
+        .auth-toggle-link a{color:#3e6e06;font-weight:600;text-decoration:none;cursor:pointer}
+        .auth-toggle-link a:hover{text-decoration:underline}
+        .auth-feedback{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:4px;line-height:1.5}
+        .auth-feedback.error{background:#fdf0ee;border:1.5px solid #e8b4a8;color:#8b3a2a}
+        .auth-feedback.success{background:#edf5e8;border:1.5px solid #a8d4a0;color:#2d6b20}
+        .hidden{display:none!important}
+        .input-error{border-color:#c0392b!important}
+        .n{font-family:'Segoe UI','Inter','Helvetica Neue',Arial,sans-serif!important}
+        @media(max-width:768px){.steps{grid-template-columns:repeat(2,1fr)}.agrid{grid-template-columns:1fr}.sarr{display:none}.hero h2{font-size:28px}}
+        @media(max-width:480px){.steps{grid-template-columns:1fr}.cta{flex-direction:column;align-items:center}}
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <div>
+        <h1>Weather Prediction and Crop Recommendation System</h1>
+        <p>Western Province, Sri Lanka</p>
+    </div>
+    <div class="header-right">
+        <span id="userInfo" class="user-info" style="display:none">Welcome, <span id="userName"></span>!</span>
+        <button id="signOutBtn" class="btn-hdr btn-signout" style="display:none" onclick="handleSignOut();location.reload()">Sign Out</button>
+        <button id="authBtn"    class="btn-hdr btn-signin">Sign In</button>
+    </div>
+</header>
+
+<div class="toast" id="toast"></div>
+
+<section class="hero">
+    <div class="badge">Agricultural Decision Support</div>
+    <h2>Smarter Crop Decisions for Western Province Farmers</h2>
+    <p>Get instant, location-specific soil analysis, seasonal weather predictions, and crop suitability recommendations. All in one guided workflow, built on real data from the Western Province of Sri Lanka.</p>
+    <div class="cta">
+        <button class="btn-enter" id="enterBtn" onclick="handleEnter()">Enter the System</button>
+        <button class="btn-guest" onclick="enterAsGuest()">Continue as Guest</button>
+    </div>
+</section>
+
+<div class="sec-label">How it works</div>
+<div class="sec-title">4 Simple Steps</div>
+<div class="steps">
+    <div class="step">
+        <div class="snum">1</div><div class="sico">🗺️</div>
+        <h3>Select Location</h3>
+        <p>Click anywhere on the interactive map of the Western Province to set your analysis location.</p>
+        <span class="sarr">></span>
+    </div>
+    <div class="step">
+        <div class="snum">2</div><div class="sico">🌱</div>
+        <h3>Soil Analysis</h3>
+        <p>View detailed soil properties and management zone classification for the selected location.</p>
+        <span class="sarr">></span>
+    </div>
+    <div class="step">
+        <div class="snum">3</div><div class="sico">🌦️</div>
+        <h3>Weather Prediction</h3>
+        <p>Get predicted temperature, rainfall, and sunshine hours for your chosen season.</p>
+        <span class="sarr">></span>
+    </div>
+    <div class="step">
+        <div class="snum">4</div><div class="sico">🌾</div>
+        <h3>Crop Recommendation</h3>
+        <p>Receive a ranked list of suitable crops and a detailed suitability report for any specific crop.</p>
+    </div>
+</div>
+
+<section class="about">
+    <div class="sec-label">Built for the field</div>
+    <div class="sec-title">Why use this system?</div>
+    <div class="agrid">
+        <div class="acard"><div class="aico">📍</div><h4>Location Specific</h4><p>Every output is derived from actual soil and weather data for the Western Province - not global averages.</p></div>
+        <div class="acard"><div class="aico">🤖</div><h4>Machine Learning Powered</h4><p>Soil clustering, weather regression, and crop suitability models trained on local datasets.</p></div>
+        <div class="acard"><div class="aico">👨‍🌾</div><h4>Easy to Use</h4><p>No technical knowledge required. Just click a location and follow the guided steps.</p></div>
+    </div>
+</section>
+
+<footer class="footer">Weather Prediction &amp; Crop Recommendation System - Western Province, Sri Lanka</footer>
+
+<!-- Auth Modal -->
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-mode="signin">Sign In</button>
+            <button class="modal-tab"        data-mode="signup">Sign Up</button>
+        </div>
+        <form id="authForm" novalidate>
+            <div class="form-group hidden" id="nameGroup"><label>Full Name</label><input id="authName" type="text"></div>
+            <div class="form-group"><label>Email</label><input id="authEmail" type="email"></div>
+            <div class="form-group"><label>Password</label><input id="authPassword" type="password"></div>
+            <div class="form-group hidden" id="confirmGroup"><label>Confirm Password</label><input id="authConfirm" type="password"></div>
+            <div id="authFeedback" class="auth-feedback hidden"></div>
+            <div class="modal-buttons">
+                <button type="submit"  class="btn-primary"   id="authSubmitBtn">Sign In</button>
+                <button type="button"  class="btn-secondary" id="authCloseBtn">Cancel</button>
+            </div>
+            <div class="auth-toggle-link hidden" id="toggleLink">Not registered? <a href="#" onclick="toggleAuthMode(event)">Sign up now</a></div>
+            <div class="auth-toggle-link hidden" id="signinLink">Already have an account? <a href="#" onclick="toggleAuthModeToSignin(event)">Sign in</a></div>
+        </form>
+    </div>
+</div>
+
+<script src="auth.js"></script>
+<script>
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+}
+
+function handleEnter() {
+    const session = getSession();
+    if (session) {
+        goToSystem(session.name);
+    } else {
+        window.__authOnSuccess = function(user) {
+            showToast('Welcome, ' + user.name.split(' ')[0] + '! Taking you in…');
+            setTimeout(() => {
+                sessionStorage.setItem('entered_system', '1');
+                window.location.href = 'index.html';
+            }, 1600);
+        };
+        openAuthModal();
+    }
+}
+
+function enterAsGuest() {
+    sessionStorage.setItem('entered_system', '1');
+    sessionStorage.setItem('is_guest', '1');
+    window.location.href = 'index.html';
+}
+
+function goToSystem(name) {
+    showToast('Welcome, ' + name.split(' ')[0] + '! Taking you in…');
+    setTimeout(() => {
+        sessionStorage.setItem('entered_system', '1');
+        window.location.href = 'index.html';
+    }, 1600);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initAuth();
+    const session = getSession();
+    if (session) {
+        applySignedInState(session);
+        document.getElementById('enterBtn').textContent = 'Enter the System';
+    }
+    applyNumericFont(document.body);
+});
+
+function applyNumericFont(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+            const tag = node.parentNode && node.parentNode.tagName;
+            if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+            if (node.parentNode.classList && node.parentNode.classList.contains('n')) return NodeFilter.FILTER_REJECT;
+            return /\d/.test(node.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        }
+    });
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(node => {
+        const parts = node.textContent.split(/([\d][\d.,]*)/);
+        if (parts.length <= 1) return;
+        const frag = document.createDocumentFragment();
+        parts.forEach(part => {
+            if (!part) return;
+            if (/^\d/.test(part)) {
+                const s = document.createElement('span');
+                s.className = 'n';
+                s.textContent = part;
+                frag.appendChild(s);
+            } else {
+                frag.appendChild(document.createTextNode(part));
+            }
+        });
+        node.parentNode.replaceChild(frag, node);
+    });
+}
+</script>
+</body>
+</html>
