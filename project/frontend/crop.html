@@ -714,57 +714,62 @@ async function handleMainAction() {
     else      await fetchSuitabilityReport(val);
 }
 
-// -- RECOMMENDED CROP LIST (calls API for every crop in parallel) -------
+// -- RECOMMENDED CROP LIST ---------------------------------------------
 async function showRecommendedList() {
     const btn = document.getElementById('mainBtn');
     btn.disabled = true;
-    btn.textContent = 'Analysing all crops…';
+    btn.textContent = 'Ranking crops…';
 
-    // Show spinner
     document.getElementById('rightPlaceholder').classList.add('hidden');
     document.getElementById('reportCard').classList.add('hidden');
     document.getElementById('cropListCard').classList.remove('hidden');
     document.getElementById('cropListContainer').innerHTML =
-        `<div class="spinner-row"><div class="spinner"></div> Running predictions for all crops…</div>`;
+        `<div class="spinner-row"><div class="spinner"></div> Ranking all crops for your location…</div>`;
 
     try {
-        const results = await Promise.all(
-            CROP_LIST.map(async crop => {
-                try {
-                    const res  = await fetch(`${CROP_API}/predict`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body:    JSON.stringify(buildPayload(crop))
-                    });
-                    const data = await res.json();
-                    return { name: crop, prob: data.probability_suitable ?? 0, ok: res.ok };
-                } catch {
-                    return { name: crop, prob: 0, ok: false };
-                }
-            })
-        );
+        // Call to /rank using tuned_svm.pkl
+        const payload = {
+            temperature:    weatherData.temperature_C,
+            rainfall:       weatherData.rainfall_mm,
+            sunshine_hours: weatherData.sunshine_h,
+            ph:             soilData.ph,
+            organic_carbon: soilData.organic_carbon,
+            cec:            soilData.cec,
+            awc:            soilData.awc,
+            bulk_density:   soilData.bulk_density,
+            texture_class:  soilData.texture_class
+        };
 
-        // Sort descending by probability (Top 10)
-        const ranked = results
-            .filter(r => r.ok)
-            .sort((a, b) => b.prob - a.prob)
-            .slice(0, 10);
+        const res  = await fetch(`${CROP_API}/rank`, {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify(payload)
+        });
 
+        const data = await res.json();
+
+        if (!res.ok) {
+            document.getElementById('cropListContainer').innerHTML =
+                `<p style="padding:16px;color:#b91c1c;font-size:13px;">⚠️ Error: ${data.error || 'Ranking failed.'}</p>`;
+            return;
+        }
+
+        const ranked = data.ranked_crops.slice(0, 10);
         const container = document.getElementById('cropListContainer');
         container.innerHTML = '';
 
         ranked.forEach((crop, i) => {
-            const pct   = (crop.prob * 100).toFixed(0);
-            const level = crop.prob >= 0.7 ? 'High' : crop.prob >= 0.5 ? 'Med' : 'Low';
+            const pct   = (crop.probability * 100).toFixed(0);
+            const level = crop.probability >= 0.7 ? 'High' : crop.probability >= 0.5 ? 'Med' : 'Low';
             const pill  = level === 'High' ? 'pill-high' : level === 'Med' ? 'pill-med' : 'pill-low';
             const item  = document.createElement('div');
             item.className = 'crop-list-item';
             item.innerHTML = `
                 <span class="crop-rank">${i + 1}</span>
-                <span>${crop.name}</span>
+                <span>${crop.crop}</span>
                 <span class="suit-pill ${pill}">${pct}%</span>
             `;
-            item.addEventListener('click', () => selectCropFromList(crop.name, item));
+            item.addEventListener('click', () => selectCropFromList(crop.crop, item));
             container.appendChild(item);
         });
 
@@ -1020,7 +1025,7 @@ function showReport(crop, prob, prediction) {
             `Bulk density (${bd.toFixed(2)} g/cm³) indicates good soil structure.`));
     }
 
-    // Texture: informational only (no optimal range - model uses texture_code internally)
+    // Texture: informational only
     factors.push({
         cls: 'factor-item fi-good', icon: 'ℹ', status: 'good',
         name: 'Soil Texture',
@@ -1037,7 +1042,7 @@ function showReport(crop, prob, prediction) {
     applyNumericFont(document.getElementById('reportCard'));
 }
 
-// -- DOWNLOAD REPORT (opens report.html as PDF page) ------
+// -- DOWNLOAD REPORT ---------------------------------------------------
 async function downloadReport() {
     const crop       = document.getElementById('reportCropName').textContent;
     const prob       = parseFloat(document.getElementById('probability').textContent) / 100;
