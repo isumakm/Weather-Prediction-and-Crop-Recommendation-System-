@@ -36,6 +36,14 @@ FEATURE_ORDER = [
 MODELS_DIR    = os.path.join(os.path.dirname(__file__), "models")
 PREPROCESSOR  = joblib.load(os.path.join(MODELS_DIR, "preprocessor.pkl"))
 MODEL         = joblib.load(os.path.join(MODELS_DIR, "xgboost_best.pkl"))
+RANK_MODEL    = joblib.load(os.path.join(MODELS_DIR, "tuned_svm.pkl"))
+
+CROP_LIST = [
+    'Banana', 'Bitter Gourd', 'Brinjal', 'Capsicum', 'Cucumber', 'Ginger',
+    'Kiriala', 'Luffa', 'Mangosteen', 'Manioc', 'Okra', 'Papaya', 'Passion Fruit',
+    'Pineapple', 'Radish', 'Rambutan', 'Snake Gourd', 'Sweet Potato', 'Turmeric',
+    'Yams', 'Yard Long Bean'
+]
 
 
 @app.route("/")
@@ -53,7 +61,6 @@ def predict():
             key = str(data["texture_class"]).strip().lower()
             texture_code = TEXTURE_CLASS_MAP.get(key, DEFAULT_TEXTURE_CODE)
             if TEXTURE_CLASS_MAP.get(key) is None:
-                # Log the unknown class but continue with the default
                 print(f"[WARN] Unknown texture_class '{data['texture_class']}' - "
                       f"defaulting to texture_code {DEFAULT_TEXTURE_CODE} (loam)")
         elif "texture_code" in data:
@@ -89,6 +96,64 @@ def predict():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
+
+
+@app.route("/rank", methods=["POST"])
+def rank():
+    try:
+        data = request.get_json()
+
+        # Resolve texture_code
+        if "texture_class" in data:
+            key = str(data["texture_class"]).strip().lower()
+            texture_code = TEXTURE_CLASS_MAP.get(key, DEFAULT_TEXTURE_CODE)
+            if TEXTURE_CLASS_MAP.get(key) is None:
+                print(f"[WARN] Unknown texture_class '{data['texture_class']}' "
+                      f"- defaulting to {DEFAULT_TEXTURE_CODE} (loam)")
+        elif "texture_code" in data:
+            texture_code = int(data["texture_code"])
+        else:
+            return jsonify({"error": "Either texture_class or texture_code is required"}), 400
+
+        numeric_fields = [
+            "temperature", "rainfall", "sunshine_hours",
+            "ph", "organic_carbon", "cec", "awc", "bulk_density"
+        ]
+        missing = [f for f in numeric_fields if f not in data]
+        if missing:
+            return jsonify({"error": f"Missing fields: {missing}"}), 400
+
+        # Build one row per crop
+        rows = []
+        for crop in CROP_LIST:
+            row = {f: data[f] for f in numeric_fields}
+            row["texture_code"] = texture_code
+            row["crop"]         = crop
+            row["scenario_id"]  = 1
+            rows.append(row)
+
+        df    = pd.DataFrame(rows)
+        proba = RANK_MODEL.predict_proba(df)[:, 1]
+        pred  = RANK_MODEL.predict(df)
+
+        results = sorted(
+            [
+                {
+                    "crop":        CROP_LIST[i],
+                    "probability": round(float(proba[i]), 4),
+                    "prediction":  "Suitable" if pred[i] == 1 else "Unsuitable"
+                }
+                for i in range(len(CROP_LIST))
+            ],
+            key=lambda x: x["probability"],
+            reverse=True
+        )
+
+        return jsonify({"ranked_crops": results})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5003)
