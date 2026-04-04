@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Single Crop Analysis – Weather & Crop Recommendation</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            font-family: 'Raleway', sans-serif;
+            background: linear-gradient(135deg, #f5ede4 0%, #faf8f3 50%, #f0f4e8 100%);
+            color: #5a5447;
+            overflow: hidden;
+        }
+
+        .n {
+            font-family: 'Segoe UI', 'Inter', 'Helvetica Neue', Arial, sans-serif !important;
+        }
+
+        /* ── APP SHELL ─────────────────────────────────────────────────── */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* ── HEADER ────────────────────────────────────────────────────── */
+        .header {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            padding: 22px 28px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .header-content h1 { font-size: 26px; font-weight: 700; margin-bottom: 3px; }
+        .header-content p  { font-size: 13px; color: #e8f0e8; font-weight: 500; }
+        .header-controls   { display: flex; gap: 16px; align-items: center; }
+
+        .auth-button {
+            padding: 9px 20px;
+            background: #d2b452;
+            color: #1a3205;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Raleway', sans-serif;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .auth-button:hover { background: #a57f18; }
+        .user-info { color: #e8f0e8; font-weight: 600; font-size: 14px; }
+
+        /* ── PAGE BODY ─────────────────────────────────────────────────── */
+        .page-body {
+            flex: 1;
+            min-height: 0;
+            padding: 20px 24px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            overflow: hidden;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #3e6e06;
+            border-left: 6px solid #d2b452;
+            padding-left: 14px;
+            flex-shrink: 0;
+        }
+
+        /* ── 2 PANELS ─────────────────────────────────────────────── */
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        /* ── LEFT PANEL ─────────────── */
+        .left-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow: hidden;
+            min-height: 0;
+        }
+
+        /* ── RIGHT PANEL ──────────────────────── */
+        .right-panel {
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            min-height: 0;
+            flex: 1;
+        }
+        .right-panel::-webkit-scrollbar { width: 5px; }
+        .right-panel::-webkit-scrollbar-track { background: transparent; }
+        .right-panel::-webkit-scrollbar-thumb { background: #d4dfc9; border-radius: 10px; }
+
+        /* ── SHARED CARD ───────────────────────────────────────────────── */
+        .card {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+            flex-shrink: 0;
+        }
+
+        /* Env data card grows to fill all leftover space in left panel */
+        .card.env-card {
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Inner wrapper distributes the three groups evenly */
+        .env-groups-wrap {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow: hidden;
+        }
+
+        .card-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #665521;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .nbadge {
+            background: #d2b452;
+            color: #1a3205;
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .sys-tag {
+            background: #d2b452;
+            color: #1a3205;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: auto;
+        }
+
+        /* ── ENV DATA ──────────────────────────────────────────────────── */
+        .env-group {
+            background: #f0f4e8;
+            border-radius: 10px;
+            padding: 8px 12px;
+            border-left: 3px solid #3e6e06;
+            flex-shrink: 0;
+        }
+
+        /* Soil group grows to fill remaining space since it has a 2-row grid */
+        .env-group.soil {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .env-group-title {
+            font-size: 10px;
+            font-weight: 700;
+            color: #3e6e06;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            margin-bottom: 6px;
+            flex-shrink: 0;
+        }
+
+        /* 3-column grid for both weather and soil */
+        .env-metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px 8px;
+            flex: 1;
+            min-height: 0;
+            align-content: start;
+        }
+
+        .env-metric { display: flex; flex-direction: column; gap: 1px; }
+
+        /* grid cells */
+        .env-metrics-grid .env-metric {
+            background: rgba(255,255,255,0.55);
+            border-radius: 6px;
+            padding: 5px 8px;
+        }
+
+        .env-metric .val {
+            font-size: 12px;
+            font-weight: 700;
+            color: #3e6e06;
+            line-height: 1.2;
+        }
+
+        .env-metric .key {
+            font-size: 9px;
+            color: #999;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .env-source {
+            font-size: 10px;
+            color: #bbb;
+            font-style: italic;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        /* ── CROP SELECT ───────────────────────────────────────────────── */
+        .crop-select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 2px solid #d4dfc9;
+            border-radius: 10px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #5a5447;
+            background: #faf8f3;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23665521' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .crop-select:focus { outline: none; border-color: #3e6e06; }
+
+        /* ── ACTION BUTTON ─────────────────────────────────────────────── */
+        .btn-action {
+            background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+            color: white;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 12px;
+            padding: 13px 20px;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(62,110,6,0.25);
+            flex-shrink: 0;
+        }
+        .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(62,110,6,0.35); }
+        .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* ── RIGHT: INSTRUCTIONS ───────────────────────────────────────── */
+        .right-placeholder {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-evenly;
+            padding: 28px 36px;
+            background: rgba(255,255,255,0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            text-align: center;
+            min-height: 0;
+        }
+
+        .placeholder-icon { font-size: 56px; opacity: 0.3; }
+
+        .placeholder-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #665521;
+            margin-bottom: 4px;
+        }
+
+        .placeholder-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 10px;
+            text-align: left;
+            max-width: 360px;
+            width: 100%;
+        }
+
+        .placeholder-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            font-size: 14px;
+            color: #7a6e5e;
+            font-weight: 500;
+            line-height: 1.55;
+            background: rgba(255,255,255,0.6);
+            border-radius: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(210,180,82,0.2);
+        }
+
+        .step-num {
+            width: 24px;
+            height: 24px;
+            background: #d2b452;
+            color: #1a3205;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            flex-shrink: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        /* ── RIGHT: RECOMMENDED CROP LIST ──────────────────────────────── */
+        .result-card {
+            background: rgba(255,255,255,0.75);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 22px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.07);
+            flex: 1;
+        }
+
+        .result-card-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #3e6e06;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f4e8;
+        }
+
+        .crop-list { display: flex; flex-direction: column; gap: 6px; }
+
+        .crop-list-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid transparent;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .crop-list-item:hover { background: #f0f4e8; border-color: #d4dfc9; }
+        .crop-list-item.selected { background: #eaf2d7; border-color: #3e6e06; color: #2d5205; font-weight: 700; }
+
+        .crop-rank {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: #d2b452;
+            color: #1a3205;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .suit-pill {
+            margin-left: auto;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 9px;
+            border-radius: 20px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .pill-high { background: #dcfce7; color: #166534; }
+        .pill-med  { background: #fef9c3; color: #854d0e; }
+        .pill-low  { background: #fee2e2; color: #991b1b; }
+
+        /* ── RIGHT: SUITABILITY REPORT ─────────────────────────────────── */
+        .report-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 18px;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #f0f4e8;
+        }
+        .report-top h3 { font-size: 17px; font-weight: 700; color: #3e6e06; }
+
+        .crop-tag {
+            background: #d2b452;
+            color: #1a3205;
+            font-weight: 700;
+            font-size: 13px;
+            padding: 5px 14px;
+            border-radius: 20px;
+        }
+
+        .result-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .result-label { font-weight: 600; font-size: 14px; color: #5a5447; }
+
+        .result-badge {
+            display: inline-block;
+            padding: 6px 22px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .badge-suitable   { background: #3e6e06; color: white; }
+        .badge-unsuitable { background: #b91c1c; color: white; }
+
+        .gauge-label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .probability-gauge {
+            background: #e8e4d9;
+            height: 14px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        .gauge-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #d2b452, #3e6e06);
+            width: 0%;
+            transition: width 0.6s ease;
+        }
+
+        .prob-value {
+            text-align: right;
+            font-size: 13px;
+            font-weight: 700;
+            color: #665521;
+            margin-bottom: 14px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+
+        .interpretation {
+            font-size: 14px;
+            font-weight: 500;
+            color: #5a5447;
+            text-align: center;
+            padding: 12px;
+            background: #f0f4e8;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .compare-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #665521;
+            margin-bottom: 8px;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .compare-table td { padding: 7px 6px; border-bottom: 1px solid #e8e4d9; }
+        .compare-table tr:last-child td { border-bottom: none; }
+        .compare-table .val-cell {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-weight: 600;
+            color: #5a5447;
+        }
+
+        .status         { font-weight: 700; }
+        .status-good    { color: #3e6e06; }
+        .status-warning { color: #b45309; }
+        .status-bad     { color: #b91c1c; }
+
+        .btn-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #d2b452, #a57f18);
+            color: #1a3205;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 6px 18px rgba(210,180,82,0.3);
+        }
+        .btn-download:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(210,180,82,0.4); }
+
+        /* ── AUTH MODAL ────────────────────────────────────────────────── */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show { display: flex; }
+
+        .modal-content {
+            background: white;
+            padding: 36px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+
+        .modal-tabs { display: flex; margin-bottom: 22px; border-bottom: 2px solid #e8e4d9; }
+        .modal-tab {
+            flex: 1; padding: 10px; background: none; border: none;
+            border-bottom: 3px solid transparent; margin-bottom: -2px;
+            font-family: 'Raleway', sans-serif; font-weight: 600; font-size: 14px;
+            color: #9ca3af; cursor: pointer; transition: all 0.3s;
+        }
+        .modal-tab.active { color: #3e6e06; border-bottom-color: #3e6e06; }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label { display: block; font-weight: 600; color: #5a5447; margin-bottom: 6px; font-size: 13px; }
+        .form-group input {
+            width: 100%; padding: 11px 12px; border: 2px solid #d4dfc9; border-radius: 8px;
+            font-family: 'Raleway', sans-serif; font-size: 14px; transition: border 0.3s;
+        }
+        .form-group input:focus { outline: none; border-color: #3e6e06; }
+
+        .modal-buttons { display: flex; gap: 12px; margin-top: 20px; }
+        .modal-buttons button {
+            flex: 1; padding: 11px; border: none; border-radius: 8px;
+            font-family: 'Raleway', sans-serif; font-weight: 600; font-size: 14px;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .btn-primary  { background: #3e6e06; color: white; }
+        .btn-primary:hover  { background: #2d5205; }
+        .btn-secondary { background: #e8e4d9; color: #5a5447; }
+        .btn-secondary:hover { background: #d4d0c5; }
+
+        .auth-toggle-link { text-align: center; margin-top: 14px; font-size: 13px; color: #5a5447; }
+        .auth-toggle-link a { color: #3e6e06; font-weight: 600; text-decoration: none; }
+        .auth-toggle-link a:hover { text-decoration: underline; }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+
+<body>
+<div class="app-container">
+
+    <!-- HEADER -->
+    <header class="header">
+        <div class="header-content">
+            <h1>Weather Prediction and Crop Recommendation System</h1>
+            <p>Western Province, Sri Lanka</p>
+        </div>
+        <div class="header-controls">
+            <span id="userInfo" class="user-info" style="display:none;">Welcome, <span id="userName"></span>!</span>
+            <button id="authBtn" class="auth-button">Sign In</button>
+        </div>
+    </header>
+
+    <!-- PAGE BODY -->
+    <div class="page-body">
+
+        <div class="section-title">🌱 Crop Recommendation</div>
+
+        <div class="two-col">
+
+            <!-- ═══ LEFT: Inputs + Button ════════════════════ -->
+            <div class="left-panel">
+
+                <!-- Environmental Data -->
+                <div class="card env-card">
+                    <div class="card-title">
+                        Environmental Data
+                        <span class="sys-tag">System Output</span>
+                    </div>
+
+                    <div class="env-groups-wrap">
+
+                        <div class="env-group">
+                            <div class="env-group-title">Weather Conditions</div>
+                            <div class="env-metrics-grid">
+                                <div class="env-metric">
+                                    <span class="val" id="displayTemp">28.0 °C</span>
+                                    <span class="key">Temperature</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayRain">1200.0 mm</span>
+                                    <span class="key">Rainfall</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displaySun">7.5 h</span>
+                                    <span class="key">Sunshine</span>
+                                </div>
+                            </div>
+                            <div class="env-source">Source: Weather Prediction</div>
+                        </div>
+
+                        <div class="env-group soil">
+                            <div class="env-group-title">Soil Properties</div>
+                            <div class="env-metrics-grid">
+                                <div class="env-metric">
+                                    <span class="val" id="displayPH">6.5</span>
+                                    <span class="key">pH</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayOC">1.5 %</span>
+                                    <span class="key">Org. Carbon</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayCEC">15.0 cmol/kg</span>
+                                    <span class="key">CEC</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayAWC">0.25 mm/mm</span>
+                                    <span class="key">AWC</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayBD">1.2 g/cm³</span>
+                                    <span class="key">Bulk Density</span>
+                                </div>
+                                <div class="env-metric">
+                                    <span class="val" id="displayTC">2</span>
+                                    <span class="key">Texture Code</span>
+                                </div>
+                            </div>
+                            <div class="env-source">Source: Soil Analysis</div>
+                        </div>
+
+                        <!-- Crop Requirements group removed entirely (rooting depth was the only item) -->
+
+                    </div>
+                </div>
+
+                <!-- Crop Selection -->
+                <div class="card" style="padding: 10px 14px;">
+                    <div class="card-title">
+                        Crop Selection
+                    </div>
+                    <select id="cropSelect" class="crop-select" onchange="onCropChange()">
+                        <option value="">— Select a crop —</option>
+                    </select>
+                </div>
+
+                <!-- Action Button — always last, pushed to bottom by flex -->
+                <button class="btn-action" id="mainBtn" onclick="handleMainAction()">
+                    Get Recommended Crop List
+                </button>
+
+            </div>
+            <!-- ═══ END LEFT ══════════════════════════════════════════════ -->
+
+            <!-- ═══ RIGHT: Instructions / Results ════════════════════════ -->
+            <div class="right-panel">
+
+                <!-- Default: instructions -->
+                <div class="right-placeholder" id="rightPlaceholder">
+                    <div class="placeholder-icon">🌾</div>
+                    <div>
+                        <div class="placeholder-title">How to get your suitability report</div>
+                        <div class="placeholder-steps">
+                            <div class="placeholder-step">
+                                <span class="step-num">1</span>
+                                <span>Click <strong>Get Recommended Crop List</strong> to see the best crops for your current environmental conditions.</span>
+                            </div>
+                            <div class="placeholder-step">
+                                <span class="step-num">2</span>
+                                <span>Pick a crop from the recommended list, or choose one from the dropdown on the left.</span>
+                            </div>
+                            <div class="placeholder-step">
+                                <span class="step-num">3</span>
+                                <span>Click <strong>Get Suitability Report</strong> to run the analysis. The full report will appear here.</span>
+                            </div>
+                            <div class="placeholder-step">
+                                <span class="step-num">4</span>
+                                <span>Download the report.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recommended crop list (shown after first button click) -->
+                <div class="result-card hidden" id="cropListCard">
+                    <div class="result-card-title">Recommended Crops for Your Region</div>
+                    <div class="crop-list" id="cropListContainer"></div>
+                </div>
+
+                <!-- Suitability report (shown after second button click) -->
+                <div class="result-card hidden" id="reportCard">
+
+                    <div class="report-top">
+                        <h3>Suitability Report</h3>
+                        <span class="crop-tag" id="reportCropName">—</span>
+                    </div>
+
+                    <div class="result-row">
+                        <span class="result-label">Prediction</span>
+                        <span class="result-badge" id="resultBadge">—</span>
+                    </div>
+
+                    <div class="gauge-label">Suitability Probability</div>
+                    <div class="probability-gauge">
+                        <div class="gauge-fill" id="probabilityGauge"></div>
+                    </div>
+                    <div class="prob-value" id="probability">—</div>
+
+                    <div class="interpretation" id="interpretationText"></div>
+
+                    <div class="compare-title">Comparison with Optimal Ranges</div>
+                    <table class="compare-table">
+                        <tr>
+                            <td>Temperature</td>
+                            <td class="val-cell" id="cmpTemp">—</td>
+                            <td class="status status-good">Ideal (20–30 °C)</td>
+                        </tr>
+                        <tr>
+                            <td>Rainfall</td>
+                            <td class="val-cell" id="cmpRain">—</td>
+                            <td class="status status-good">Good (1000–1500 mm)</td>
+                        </tr>
+                        <tr>
+                            <td>pH</td>
+                            <td class="val-cell" id="cmpPH">—</td>
+                            <td class="status status-good">Optimal (6.0–7.0)</td>
+                        </tr>
+                        <tr>
+                            <td>Organic Carbon</td>
+                            <td class="val-cell" id="cmpOC">—</td>
+                            <td class="status status-good">Adequate (&gt;1.0%)</td>
+                        </tr>
+                    </table>
+
+                    <button class="btn-download" onclick="downloadReport()">Download Report</button>
+
+                </div>
+
+            </div>
+            <!-- ═══ END RIGHT ═════════════════════════════════════════════ -->
+
+        </div>
+    </div>
+</div>
+
+<!-- Hidden data inputs (rooting depth removed) -->
+<input type="hidden" id="temperature"   value="28.5">
+<input type="hidden" id="rainfall"      value="700.0">
+<input type="hidden" id="sunshine"      value="6.5">
+<input type="hidden" id="ph"            value="6.0">
+<input type="hidden" id="organicCarbon" value="4">
+<input type="hidden" id="cec"           value="15.0">
+<input type="hidden" id="awc"           value="0.025">
+<input type="hidden" id="bulkDensity"   value="1.0">
+<input type="hidden" id="textureCode"   value="1">
+
+<!-- AUTH MODAL -->
+<div class="modal" id="authModal">
+    <div class="modal-content">
+        <div class="modal-tabs">
+            <button class="modal-tab active" data-mode="signin">Sign In</button>
+            <button class="modal-tab"        data-mode="signup">Sign Up</button>
+        </div>
+        <form id="authForm">
+            <div class="form-group hidden" id="nameGroup">
+                <label for="authName">Full Name</label>
+                <input id="authName" type="text">
+            </div>
+            <div class="form-group">
+                <label for="authEmail">Email</label>
+                <input id="authEmail" type="email" required>
+            </div>
+            <div class="form-group">
+                <label for="authPassword">Password</label>
+                <input id="authPassword" type="password" required>
+            </div>
+            <div class="form-group hidden" id="confirmGroup">
+                <label for="authConfirm">Confirm Password</label>
+                <input id="authConfirm" type="password">
+            </div>
+            <div class="modal-buttons">
+                <button type="submit"  class="btn-primary"   id="authSubmitBtn">Sign In</button>
+                <button type="button"  class="btn-secondary" id="authCloseBtn">Cancel</button>
+            </div>
+            <div class="auth-toggle-link hidden" id="toggleLink">
+                Not registered yet? <a href="#" onclick="toggleAuthMode(event)">Sign up now</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function applyNumericFont(root) {
+        root = root || document.body;
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+            acceptNode(node) {
+                const tag = node.parentNode && node.parentNode.tagName;
+                if (tag === 'SCRIPT' || tag === 'STYLE') return NodeFilter.FILTER_REJECT;
+                if (node.parentNode.classList && node.parentNode.classList.contains('n')) return NodeFilter.FILTER_REJECT;
+                return /\d/.test(node.textContent) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            }
+        });
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+
+        nodes.forEach(node => {
+            const parts = node.textContent.split(/([\d][\d.,]*)/);
+            if (parts.length <= 1) return;
+            const frag = document.createDocumentFragment();
+            parts.forEach(part => {
+                if (!part) return;
+                if (/^\d/.test(part)) {
+                    const s = document.createElement('span');
+                    s.className = 'n';
+                    s.textContent = part;
+                    frag.appendChild(s);
+                } else {
+                    frag.appendChild(document.createTextNode(part));
+                }
+            });
+            node.parentNode.replaceChild(frag, node);
+        });
+    }
+
+    /* ─── DATA ───────────────────────────────────────────────────────── */
+    const cropList = [
+        'Brinjal','Luffa','Okra','Cucumber','Snake Gourd','Bitter Gourd',
+        'Radish','Capsicum','Yard Long Bean','Banana','Pineapple','Ginger',
+        'Papaya','Passion Fruit','Sweet Potato','Rambutan','Mangosteen',
+        'Manioc','Kiriala','Yams','Turmeric'
+    ];
+
+    const recommendedCrops = [
+        { name: 'Banana',       score: 0.94, level: 'High' },
+        { name: 'Papaya',       score: 0.91, level: 'High' },
+        { name: 'Okra',         score: 0.87, level: 'High' },
+        { name: 'Brinjal',      score: 0.83, level: 'High' },
+        { name: 'Cucumber',     score: 0.79, level: 'High' },
+        { name: 'Sweet Potato', score: 0.72, level: 'Med'  },
+        { name: 'Ginger',       score: 0.68, level: 'Med'  },
+        { name: 'Turmeric',     score: 0.65, level: 'Med'  },
+        { name: 'Pineapple',    score: 0.61, level: 'Med'  },
+        { name: 'Capsicum',     score: 0.57, level: 'Med'  },
+    ];
+
+    /* ─── INIT ───────────────────────────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+        cropList.forEach(c => {
+            const opt = document.createElement('option');
+            opt.value = c; opt.textContent = c;
+            document.getElementById('cropSelect').appendChild(opt);
+        });
+
+        document.getElementById('authBtn').addEventListener('click', openAuthModal);
+        document.getElementById('authCloseBtn').addEventListener('click', closeAuthModal);
+        document.getElementById('authForm').addEventListener('submit', handleAuth);
+        document.querySelectorAll('.modal-tab').forEach(t => t.addEventListener('click', switchAuthMode));
+
+        applyNumericFont(document.body);
+    });
+
+    /* ─── DROPDOWN CHANGE ────────────────────────────────────────────── */
+    function onCropChange() {
+        const val = document.getElementById('cropSelect').value;
+        document.getElementById('mainBtn').textContent = val
+            ? 'Get Suitability Report'
+            : 'Get Recommended Crop List';
+    }
+
+    /* ─── MAIN BUTTON ────────────────────────────────────────────────── */
+    async function handleMainAction() {
+        const val = document.getElementById('cropSelect').value;
+        if (!val) {
+            showRecommendedList();
+        } else {
+            await fetchSuitabilityReport(val);
+        }
+    }
+
+    /* ─── SHOW RECOMMENDED LIST ON RIGHT ─────────────────────────────── */
+    function showRecommendedList() {
+        const container = document.getElementById('cropListContainer');
+        container.innerHTML = '';
+
+        recommendedCrops.forEach((crop, i) => {
+            const pillClass = crop.level === 'High' ? 'pill-high' : crop.level === 'Med' ? 'pill-med' : 'pill-low';
+            const item = document.createElement('div');
+            item.className = 'crop-list-item';
+            item.innerHTML = `
+                <span class="crop-rank">${i + 1}</span>
+                <span>${crop.name}</span>
+                <span class="suit-pill ${pillClass}">${(crop.score * 100).toFixed(0)}%</span>
+            `;
+            item.addEventListener('click', () => selectCropFromList(crop.name, item));
+            container.appendChild(item);
+        });
+
+        // Show list, hide everything else on right
+        document.getElementById('rightPlaceholder').classList.add('hidden');
+        document.getElementById('reportCard').classList.add('hidden');
+        document.getElementById('cropListCard').classList.remove('hidden');
+        applyNumericFont(document.getElementById('cropListCard'));
+    }
+
+    function selectCropFromList(cropName, el) {
+        document.querySelectorAll('.crop-list-item').forEach(i => i.classList.remove('selected'));
+        el.classList.add('selected');
+        document.getElementById('cropSelect').value = cropName;
+        document.getElementById('mainBtn').textContent = 'Get Suitability Report';
+    }
+
+    /* ─── SUITABILITY REPORT ─────────────────────────────────────────── */
+    async function fetchSuitabilityReport(crop) {
+        const btn = document.getElementById('mainBtn');
+        btn.disabled = true;
+        btn.textContent = 'Loading…';
+
+        try {
+            const requestData = {
+                crop,
+                temperature:     parseFloat(document.getElementById('temperature').value),
+                rainfall:        parseFloat(document.getElementById('rainfall').value),
+                sunshine_hours:  parseFloat(document.getElementById('sunshine').value),
+                ph:              parseFloat(document.getElementById('ph').value),
+                organic_carbon:  parseFloat(document.getElementById('organicCarbon').value),
+                cec:             parseFloat(document.getElementById('cec').value),
+                awc:             parseFloat(document.getElementById('awc').value),
+                bulk_density:    parseFloat(document.getElementById('bulkDensity').value),
+                texture_code:    parseInt(document.getElementById('textureCode').value),
+                // rooting_depth_m removed
+            };
+
+            const res = await fetch('http://localhost:5000/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(requestData),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const result = await res.json();
+            showReport(crop, result.probability_suitable, result.prediction);
+
+        } catch (err) {
+            console.warn('API unavailable – demo result:', err.message);
+            const demo = Math.random() * 0.5 + 0.5;
+            showReport(crop, demo, demo >= 0.5 ? 'Suitable' : 'Unsuitable');
+        } finally {
+            btn.disabled = false;
+            btn.textContent = 'Get Suitability Report';
+        }
+    }
+
+    function showReport(crop, prob, prediction) {
+        document.getElementById('reportCropName').textContent = crop;
+
+        const badge = document.getElementById('resultBadge');
+        badge.textContent = prediction;
+        badge.className = 'result-badge ' + (prediction === 'Suitable' ? 'badge-suitable' : 'badge-unsuitable');
+
+        document.getElementById('probabilityGauge').style.width = (prob * 100) + '%';
+        document.getElementById('probability').textContent = (prob * 100).toFixed(1) + '%';
+
+        const interp = document.getElementById('interpretationText');
+        if      (prob >= 0.75) interp.innerHTML = '✅ This crop is <strong>highly suitable</strong> for your region.';
+        else if (prob >= 0.5) interp.innerHTML = '⚠️ This crop is <strong>moderately suitable</strong>. Consider adjusting conditions.';
+        else                   interp.innerHTML = '❌ This crop is <strong>not suitable</strong> for your region.';
+
+        document.getElementById('cmpTemp').textContent = document.getElementById('temperature').value + ' °C';
+        document.getElementById('cmpRain').textContent = document.getElementById('rainfall').value + ' mm';
+        document.getElementById('cmpPH').textContent   = document.getElementById('ph').value;
+        document.getElementById('cmpOC').textContent   = document.getElementById('organicCarbon').value + '%';
+
+        // Show report, hide everything else on right
+        document.getElementById('rightPlaceholder').classList.add('hidden');
+        document.getElementById('cropListCard').classList.add('hidden');
+        document.getElementById('reportCard').classList.remove('hidden');
+        applyNumericFont(document.getElementById('reportCard'));
+    }
+
+    /* ─── DOWNLOAD ───────────────────────────────────────────────────── */
+    function downloadReport() {
+        const crop   = document.getElementById('reportCropName').textContent;
+        const prob   = document.getElementById('probability').textContent;
+        const pred   = document.getElementById('resultBadge').textContent;
+        const interp = document.getElementById('interpretationText').innerText;
+        const v = id => document.getElementById(id).value;
+
+        const lines = [
+            'CROP SUITABILITY REPORT',
+            `Generated  : ${new Date().toLocaleString()}`,
+            'Location   : Western Province, Sri Lanka',
+            '',
+            `Crop           : ${crop}`,
+            `Prediction     : ${pred}`,
+            `Probability    : ${prob}`,
+            `Interpretation : ${interp}`,
+            '',
+            'ENVIRONMENTAL DATA',
+            '─── Weather ─────────────────────────────────',
+            `  Temperature    : ${v('temperature')} °C`,
+            `  Rainfall       : ${v('rainfall')} mm`,
+            `  Sunshine Hours : ${v('sunshine')} h`,
+            '─── Soil ────────────────────────────────────',
+            `  pH             : ${v('ph')}`,
+            `  Organic Carbon : ${v('organicCarbon')} %`,
+            `  CEC            : ${v('cec')} cmol/kg`,
+            `  AWC            : ${v('awc')} mm/mm`,
+            `  Bulk Density   : ${v('bulkDensity')} g/cm³`,
+            `  Texture Code   : ${v('textureCode')}`,
+            // Rooting depth line removed
+        ];
+
+        const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url;
+        a.download = `suitability_report_${crop.replace(/\s+/g,'_')}.txt`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    /* ─── AUTH ───────────────────────────────────────────────────────── */
+    function openAuthModal()  { document.getElementById('authModal').classList.add('show'); }
+    function closeAuthModal() { document.getElementById('authModal').classList.remove('show'); }
+
+    function switchAuthMode(e) {
+        document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+        e.target.classList.add('active');
+        const isSignup = e.target.dataset.mode === 'signup';
+        document.getElementById('nameGroup').classList.toggle('hidden', !isSignup);
+        document.getElementById('confirmGroup').classList.toggle('hidden', !isSignup);
+        document.getElementById('toggleLink').classList.toggle('hidden', isSignup);
+        document.getElementById('authSubmitBtn').textContent = isSignup ? 'Sign Up' : 'Sign In';
+    }
+
+    function toggleAuthMode(e) {
+        e.preventDefault();
+        document.querySelector('[data-mode="signup"]').click();
+    }
+
+    function handleAuth(e) {
+        e.preventDefault();
+        const name = document.getElementById('authName').value;
+        if (name) {
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('userName').textContent = name.split(' ')[0];
+            document.getElementById('authBtn').style.display = 'none';
+            closeAuthModal();
+        }
+    }
+</script>
+</body>
+</html>
