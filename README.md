@@ -1,4 +1,3 @@
-@@ -1,24 +1,296 @@
 # 🌾 Weather Prediction and Crop Recommendation System
 # 🌾 Weather Prediction and Crop Recommendation System - Western Province, Sri Lanka
 
