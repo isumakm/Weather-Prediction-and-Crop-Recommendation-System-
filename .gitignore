@@ -1,0 +1,8 @@
+.vscode/
+__pycache__/
+.ipynb_checkpoints/
+.env
+
+soil_suitability/data/
+
+soil_suitability/outputs/
