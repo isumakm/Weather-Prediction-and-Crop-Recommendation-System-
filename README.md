@@ -1,13 +1,10 @@
-@@ -1,24 +1,296 @@
 # 🌾 Weather Prediction and Crop Recommendation System
-# 🌾 Weather Prediction and Crop Recommendation System - Western Province, Sri Lanka
 
 **An integrated agricultural decision support system for the Western Province of Sri Lanka**
 
 
 ## 📝 Project Overview
 
-### The Challenge: Climate Vulnerability in Sri Lanka's Western Province
 ### The Challenge
 
 The Western Province (Colombo, Gampaha, and Kalutara districts) faces escalating climate challenges that threaten agricultural productivity and food security. Farmers and agricultural officers currently make planting decisions based on tradition and general knowledge rather than actual soil and weather data specific to their location. This leads to suboptimal crop selection, poor yields, and wasted resources.
@@ -113,7 +110,7 @@ project/
 ### Prerequisites
 
 - Python 3.11
-- Windows (for `.bat` scripts) — Linux/Mac users can run each service manually
+- Windows (for `.bat` scripts) - Linux/Mac users can run each service manually
 
 ### First-time Setup
 
@@ -282,14 +279,9 @@ Three access modes:
 - Develop a mobile application for field officers in low-connectivity areas
 
 
-The Western Province, covering Colombo, Gampaha, and Kalutara districts, faces distinct and escalating climate challenges that threaten agricultural productivity and food security:
 
-* **Colombo District:** While drought is uncommon, untimely rainfall during traditionally dry months (February to mid-March) disrupts flowering cycles in valuable fruit crops like rambutan and mangosteen. Excessive rainfall and frequent flooding pose significant threats to agricultural activities throughout the region.
-* **Gampaha District:** Characterized by flat terrain ideal for fruit cultivation, this district suffers from intense rains during the first inter-monsoon (April) and southwest monsoon (May to mid-July). These downpours adversely affect fruit yields, block drainage systems, and cause flash floods that impact paddy cultivation in river floodplains.
-* **Kalutara District:** Heavily affected by torrential rainfall, this district's low-lying areas face regular flooding from the overflowing Kalu Ganga, particularly during the southwest monsoon and when weather systems develop in the Bay of Bengal (October to early January).
 ## 👥 Team
 
-### Our Solution: An Integrated Climate Intelligence Platform
 | Member | Component |
 |---|---|
 | Withanage Isum Akmitha | Single Crop Analysis |
@@ -297,15 +289,8 @@ The Western Province, covering Colombo, Gampaha, and Kalutara districts, faces d
 | Thirusha Kannathasan | Weather Prediction |
 | Manura Lavod Dulnath Hettiarachchi | Multi Crop Ranking |
 
-This system provides data-driven, climate-resilient agricultural decision support specifically tailored to the Western Province's unique challenges. By integrating high-resolution weather forecasting, detailed soil analysis, and crop science, we help farmers and agricultural officers:
 
-* Anticipate climate risks before they impact crops
-* Select appropriate crops and varieties based on soil resilience characteristics
-* Implement timely adaptations to mitigate weather-related losses
-* Optimize resource allocation for sustainable productivity
 
-## 🖧 System Architecture
 ## 📄 License
 
-![alt text](https://github.com/isumakm/Weather-Prediction-and-Crop-Recommendation-System-/blob/main/System%20Architecture.jpg?raw=true)
 This project was developed as part of the BSc (Hons) in Artificial Intelligence and Data Science at Robert Gordon University Aberdeen. All rights reserved.
