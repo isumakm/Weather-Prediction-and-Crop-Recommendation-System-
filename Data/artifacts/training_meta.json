@@ -1,0 +1,27 @@
+{
+  "crop_list": [
+    "Banana",
+    "Bitter Gourd",
+    "Brinjal",
+    "Capsicum",
+    "Cucumber",
+    "Ginger",
+    "Kiriala",
+    "Luffa",
+    "Mangosteen",
+    "Manioc",
+    "Okra",
+    "Papaya",
+    "Passion Fruit",
+    "Pineapple",
+    "Radish",
+    "Rambutan",
+    "Snake Gourd",
+    "Sweet Potato",
+    "Turmeric",
+    "Yams",
+    "Yard Long Bean"
+  ],
+  "threshold_default": 0.5,
+  "fallback_sunshine_median": 7.481220244131389
+}
