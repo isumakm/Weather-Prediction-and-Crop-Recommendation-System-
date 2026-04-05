@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Python virtual environment
 venv/
 .env/
@@ -14,3 +15,13 @@ __pycache__/
 # OS files
 .DS_Store
 Thumbs.db
+=======
+.vscode/
+__pycache__/
+.ipynb_checkpoints/
+.env
+
+soil_suitability/data/
+
+soil_suitability/outputs/
+>>>>>>> 600eeee18a6c7c822bc6bc3370abd78d1fff3409
