@@ -1,0 +1,448 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Seasonal Weather Prediction</title>
+
+  <style>
+    :root{
+      --bg: #f4f6f1;
+      --text: #1f2937;
+      --muted: rgba(17,24,39,.62);
+
+      --card: #ffffff;
+      --border: rgba(17,24,39,.10);
+      --shadow: 0 18px 50px rgba(17,24,39,.10);
+
+      --radius-xl: 22px;
+      --radius-lg: 16px;
+
+      --accent: #d6c06a;
+      --accent-hover: #c9b35c;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body { height: 100%; width: 100%; margin: 0; }
+    body{
+      background: var(--bg);
+      color: var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    }
+
+    .header {
+      width: 100%;
+      background: linear-gradient(135deg, #3e6e06 0%, #665521 100%);
+      color: white;
+      padding: 18px 22px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-content h1 {
+      font-size: 28px;
+      font-weight: 800;
+      margin: 0 0 4px;
+      letter-spacing: .2px;
+    }
+
+    .header-content p {
+      margin: 0;
+      font-size: 13px;
+      color: #e8f0e8;
+      font-weight: 600;
+    }
+
+    .header-controls {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .auth-button {
+      padding: 10px 20px;
+      background: #d2b452;
+      color: #1a3205;
+      border: none;
+      border-radius: 10px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 10px 18px rgba(0,0,0,.15);
+    }
+
+    .auth-button:hover { background: #a57f18; }
+
+    .wpContainer{
+      width: min(1200px, 96vw);
+      margin: 26px auto;
+    }
+
+    .sectionHeader{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: #f7f6f2;
+      border: 1px solid rgba(17,24,39,.08);
+      margin-bottom: 16px;
+    }
+
+    .sectionBar{
+      width: 4px;
+      height: 22px;
+      border-radius: 999px;
+      background: #b7932a;
+    }
+
+    .sectionIcon{
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    .sectionTitle{
+      margin: 0;
+      font-size: 16px;
+      font-weight: 900;
+      color: #2f3a20;
+    }
+
+    .sectionTag{
+      margin-left:auto;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .6px;
+      text-transform: uppercase;
+      color: #2f3a20;
+      background: #efe6c8;
+      border: 1px solid rgba(183,147,42,.35);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .wpCard{
+      background: var(--card);
+      border: 1px solid rgba(17,24,39,.08);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .wpCardHeader{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .wpCardHeader h2{
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .wpError{
+      background: #fde8e8;
+      border: 1px solid rgba(239,68,68,.2);
+      color: #b91c1c;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      margin-bottom: 14px;
+      display: none;
+    }
+
+    .wpGrid{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .wpField label{
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .wpField input, .wpField select{
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid rgba(17,24,39,.12);
+      padding: 12px 12px;
+      background:#fbfbfb;
+      font-size: 14px;
+      outline: none;
+      transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+    }
+
+    .wpField input:focus, .wpField select:focus{
+      background:#fff;
+      border-color: rgba(62,110,6,.35);
+      box-shadow: 0 0 0 5px rgba(62,110,6,.12);
+    }
+
+    .wpBtn{
+      margin-top: 16px;
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-weight: 900;
+      font-size: 15px;
+      cursor: pointer;
+      color: #1a3205;
+      background: linear-gradient(135deg, #d2b452 0%, #b7932a 100%);
+      box-shadow: 0 14px 26px rgba(17,24,39,.14);
+      transition: transform .14s ease, box-shadow .14s ease, filter .14s ease;
+    }
+
+    .wpBtn:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(17,24,39,.18);
+      filter: saturate(1.05);
+    }
+
+    .wpBtn:disabled{
+      opacity: .7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .wpDivider{
+      height: 1px;
+      background: var(--border);
+      margin: 18px 0;
+    }
+
+    .wpResultsGrid{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .wpResultCard{
+      position: relative;
+      border-radius: var(--radius-lg);
+      background: #eef2ea;
+      border: 1px solid rgba(17,24,39,.10);
+      padding: 18px;
+      box-shadow: 0 10px 20px rgba(17,24,39,.08);
+      overflow: hidden;
+    }
+
+    .wpResultCard::before{
+      content:"";
+      position:absolute;
+      left:0;
+      top:0;
+      bottom:0;
+      width: 5px;
+      background: linear-gradient(180deg, #2f5b08 0%, #b7932a 100%);
+      opacity: .9;
+    }
+
+    .wpResultTitle{
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      color: rgba(17,24,39,.70);
+      margin-bottom: 10px;
+    }
+
+    .wpResultValue{
+      font-size: 34px;
+      font-weight: 950;
+      color: #111827;
+    }
+
+    .wpBtnSecondary{
+      margin-top: 14px;
+      width: 100%;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-weight: 900;
+      cursor: pointer;
+      background: linear-gradient(135deg, #2f5b08 0%, #6b5b1f 100%);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,.14);
+      box-shadow: 0 14px 26px rgba(17,24,39,.14);
+      transition: transform .14s ease, box-shadow .14s ease;
+      display: none;
+    }
+
+    .wpBtnSecondary:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 18px 34px rgba(17,24,39,.18);
+    }
+
+    @media (max-width: 900px){
+      .wpGrid, .wpResultsGrid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="header">
+    <div class="header-content">
+      <h1>Weather Prediction and Crop Recommendation System</h1>
+      <p>Western Province, Sri Lanka</p>
+    </div>
+    <div class="header-controls">
+      <button class="auth-button" type="button">Sign In</button>
+    </div>
+  </header>
+
+  <main class="wpContainer">
+    <div class="sectionHeader">
+      <span class="sectionBar"></span>
+      <span class="sectionIcon">🌦️</span>
+      <h3 class="sectionTitle">Seasonal Weather Prediction</h3>
+      <span class="sectionTag">SYSTEM OUTPUT</span>
+    </div>
+
+    <section class="wpCard">
+      <div class="wpCardHeader">
+        <h2>Seasonal Weather Data</h2>
+      </div>
+
+      <div id="errorBox" class="wpError"></div>
+
+      <div class="wpGrid">
+        <div class="wpField">
+          <label for="year">Year</label>
+          <input id="year" type="number" placeholder="e.g., 2026" min="2000" max="2100" />
+        </div>
+
+        <div class="wpField">
+          <label for="season">Season</label>
+          <select id="season">
+            <option value="">Select season</option>
+            <option value="South-west monsoon">South-west monsoon</option>
+            <option value="Intermonsoon after South-west monsoon">Intermonsoon after South-west monsoon</option>
+            <option value="North-east monsoon">North-east monsoon</option>
+            <option value="Intermonsoon after North-east monsoon">Intermonsoon after North-east monsoon</option>
+          </select>
+        </div>
+
+        <div class="wpField">
+          <label for="location_id">Location ID</label>
+          <input id="location_id" type="text" placeholder="e.g., 1" />
+        </div>
+      </div>
+
+      <button id="predictBtn" class="wpBtn" type="button">Predict Seasonal Weather</button>
+
+      <div class="wpDivider"></div>
+
+      <div class="wpResultsGrid">
+        <div class="wpResultCard">
+          <div class="wpResultTitle">Temperature</div>
+          <div id="tempOut" class="wpResultValue">—</div>
+        </div>
+
+        <div class="wpResultCard">
+          <div class="wpResultTitle">Rainfall</div>
+          <div id="rainOut" class="wpResultValue">—</div>
+        </div>
+
+        <div class="wpResultCard">
+          <div class="wpResultTitle">Sunshine</div>
+          <div id="sunOut" class="wpResultValue">—</div>
+        </div>
+      </div>
+
+      <button id="cropBtn" class="wpBtnSecondary" type="button">Crop Recommendation</button>
+    </section>
+  </main>
+
+  <script>
+    const API = "http://127.0.0.1:5000";
+
+    const $ = (id) => document.getElementById(id);
+
+    const errorBox = $("errorBox");
+    const predictBtn = $("predictBtn");
+    const cropBtn = $("cropBtn");
+
+    const tempOut = $("tempOut");
+    const rainOut = $("rainOut");
+    const sunOut  = $("sunOut");
+
+    function showError(msg){
+      errorBox.style.display = "block";
+      errorBox.textContent = msg;
+    }
+
+    function clearError(){
+      errorBox.style.display = "none";
+      errorBox.textContent = "";
+    }
+
+    function setLoading(isLoading){
+      predictBtn.disabled = isLoading;
+      predictBtn.textContent = isLoading ? "Predicting..." : "Predict Seasonal Weather";
+    }
+
+    predictBtn.addEventListener("click", async () => {
+      clearError();
+      cropBtn.style.display = "none";
+
+      const year = $("year").value.trim();
+      const season = $("season").value;
+      const location_id = $("location_id").value.trim();
+
+      if(!year) return showError("Please enter a year.");
+      if(!season) return showError("Please select a season.");
+      if(!location_id) return showError("Please enter location_id.");
+
+      setLoading(true);
+
+      try{
+        const res = await fetch(`${API}/predict`, {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({
+            year: Number(year),
+            season,
+            location_id
+          })
+        });
+
+        const data = await res.json();
+
+        if(!res.ok){
+          showError(data?.error || "Prediction failed.");
+          setLoading(false);
+          return;
+        }
+
+        const temp = data.temperature_C;
+        const rain = data.rainfall_mm;
+        const sun  = data.sunshine_h;
+
+        tempOut.textContent = (temp === undefined || temp === null) ? "—" : `${Number(temp).toFixed(2)} °C`;
+        rainOut.textContent = (rain === undefined || rain === null) ? "—" : `${Number(rain).toFixed(2)} mm`;
+        sunOut.textContent  = (sun  === undefined || sun  === null) ? "—" : `${Number(sun).toFixed(2)} h`;
+
+        cropBtn.style.display = "block";
+      } catch(e){
+        showError("Cannot connect to Flask. Make sure Flask is running on 127.0.0.1:5000");
+      } finally {
+        setLoading(false);
+      }
+    });
+
+    cropBtn.addEventListener("click", () => {
+      alert("Crop Recommendation button clicked");
+    });
+  </script>
+</body>
+</html>

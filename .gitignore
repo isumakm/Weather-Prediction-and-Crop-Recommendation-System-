@@ -1,3 +1,21 @@
+<<<<<<< HEAD
+# Python virtual environment
+venv/
+.env/
+.venv/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
+=======
 .vscode/
 __pycache__/
 .ipynb_checkpoints/
@@ -6,3 +24,4 @@ __pycache__/
 soil_suitability/data/
 
 soil_suitability/outputs/
+>>>>>>> 600eeee18a6c7c822bc6bc3370abd78d1fff3409

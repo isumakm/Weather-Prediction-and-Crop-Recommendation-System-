@@ -1,0 +1,20 @@
+{
+    "seasonal_temperature": {
+        "target": "seasonal_temperature",
+        "mae": 0.46830374590789725,
+        "rmse": 0.6112198968158805,
+        "r2": 0.9598293994517604
+    },
+    "seasonal_rainfall": {
+        "target": "seasonal_rainfall",
+        "mae": 116.86146313699041,
+        "rmse": 178.32522120093967,
+        "r2": 0.7805905610125093
+    },
+    "seasonal_sunshine": {
+        "target": "seasonal_sunshine",
+        "mae": 0.265854039371833,
+        "rmse": 0.348714320316918,
+        "r2": 0.8914617105538364
+    }
+}
